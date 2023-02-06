@@ -44,4 +44,32 @@ export class TwitterDriver {
       }
     })())
   }
+
+  getTweetHistoryIds (id: string): void {
+    this.jobs.push((async (): Promise<string[]> => {
+      const driver = await this.newDriver()
+      await driver.get(`https://www.twitter.com/x/status/${id}/history`)
+      await driver.wait(async () => {
+        return (await driver.findElements(By.css('div[data-testid="empty_state_header_text"]'))).length > 0 ||
+          (await driver.findElements(By.css('time'))).length > 0
+      })
+
+      // check if there is a history
+      if ((await driver.findElements(By.css('div[data-testid="empty_state_header_text"]'))).length > 0) {
+        return [id]
+      }
+
+      const tweetHistoryIds: string[] = []
+      const timeElements = await driver.findElements(By.css('time'))
+      for (const timeElement of timeElements) {
+        const tweetUrl = await timeElement.findElement(By.xpath('./..')).getAttribute('href')
+        const tweetIdMatch = tweetUrl.match(/^https:\/\/twitter\.com\/.*?\/.*?\/(.*)$/)
+        if (tweetIdMatch != null) {
+          tweetHistoryIds.push(tweetIdMatch[1])
+        }
+      }
+      await driver.close()
+      return tweetHistoryIds
+    })())
+  }
 }
