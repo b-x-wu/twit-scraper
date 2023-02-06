@@ -11,4 +11,27 @@ describe('get tweet', () => {
 
     expect(actualOutput).toBe(expectedOutput)
   }, 10000)
+
+  test('gets correct tweet history ids for tweet with no history', async () => {
+    const twitterDriver = new TwitterDriver({})
+    twitterDriver.getTweetHistoryIds('1587946525245816832')
+
+    const actualOutput = (await twitterDriver.exec())[0]
+    const expectedOutput = '1587946525245816832'
+
+    expect(actualOutput.length).toBe(1)
+    expect(actualOutput[0]).toBe(expectedOutput)
+  }, 10000)
+
+  test('gets correct tweet history ids for tweet with history', async () => {
+    const twitterDriver = new TwitterDriver({})
+    twitterDriver.getTweetHistoryIds('1622579998346608641')
+
+    const actualOutput = (await twitterDriver.exec())[0]
+    const expectedOutput = ['1622579998346608641', '1622579699498254338']
+
+    expect(actualOutput.length).toBe(2)
+    expect(actualOutput[0]).toBe(expectedOutput[0])
+    expect(actualOutput[1]).toBe(expectedOutput[1])
+  }, 10000)
 })
