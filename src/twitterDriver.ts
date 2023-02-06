@@ -33,16 +33,17 @@ export class TwitterDriver {
 
   getTweetContent (id: string): void {
     this.jobs.push((async (): Promise<Tweet> => {
+      // TODO: how to get around the age filter
+      // TODO: the title doesn't contain the newline character and instead replaces them with spaces
       const driver = await this.newDriver()
-      const tweetSelector = By.css('div.tweet-text')
-      await driver.get(`https://www.sotwe.com/tweet/${id}`) // sotwe gets around age filter
-      await driver.wait(until.elementLocated(tweetSelector))
-      const tweetElement = await driver.findElement(tweetSelector)
-      const tweetText = (await tweetElement.getText()).trim()
+      await driver.get(`https://www.twitter.com/x/status/${id}`)
+      await driver.wait(until.titleContains('on Twitter'))
+      const titleText = await driver.getTitle()
+      const tweetMatch = titleText.match(/on Twitter: "([\s\S]*)" \/ Twitter$/)
       await driver.close()
       return {
         id,
-        text: tweetText,
+        text: tweetMatch != null ? tweetMatch[1] : '',
         edit_history_tweet_ids: []
       }
     })())

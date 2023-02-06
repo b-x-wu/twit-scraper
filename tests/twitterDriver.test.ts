@@ -4,20 +4,20 @@ import { describe, expect, test } from '@jest/globals'
 describe('get tweet', () => {
   test('gets correct tweet content', async () => {
     const twitterDriver = new TwitterDriver({})
-    twitterDriver.getTweetContent('1587946525245816832')
+    twitterDriver.getTweetContent('1460323737035677698')
 
     const actualOutput = (await twitterDriver.exec())[0].text
-    const expectedOutput = 'We’re currently hard at work to make Twitter better for everyone, including developers! We’ve decided to cancel the #Chirp developer conference while we build some things that we’re excited to share with you soon.'
+    const expectedOutput = 'Introducing a new era for the Twitter Developer Platform! 📣The Twitter API v2 is now the primary API and full of new features ⏱Immediate access for most use cases, or apply to get more access for free 📖Removed certain restrictions in the Policy https://t.co/Hrm15bkBWJ https://t.co/YFfCDErHsg'
 
     expect(actualOutput).toBe(expectedOutput)
   }, 10000)
 
   test('gets correct tweet history ids for tweet with no history', async () => {
     const twitterDriver = new TwitterDriver({})
-    twitterDriver.getTweetHistoryIds('1587946525245816832')
+    twitterDriver.getTweetHistoryIds('1460323737035677698')
 
     const actualOutput = (await twitterDriver.exec())[0]
-    const expectedOutput = '1587946525245816832'
+    const expectedOutput = '1460323737035677698'
 
     expect(actualOutput.length).toBe(1)
     expect(actualOutput[0]).toBe(expectedOutput)
