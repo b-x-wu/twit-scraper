@@ -14,7 +14,7 @@ export interface Tweet {
   }
   author_id?: string
   conversation_id?: string
-  created_at: string // in the iso-8601 format
+  created_at?: string // in the iso-8601 format
   edit_controls?: {
     edits_remaining: number
     is_edit_eligible: boolean
@@ -31,7 +31,7 @@ export interface Tweet {
     }>
   }
   in_reply_to_user_id?: string
-  lang: string // BCP47 language tag
+  lang?: string // BCP47 language tag
   organic_metrics?: {
     impression_count: number // TODO: should this be replaced with view count?
     like_count: number
