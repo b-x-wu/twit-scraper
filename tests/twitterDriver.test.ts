@@ -10,5 +10,5 @@ describe('get tweet', () => {
     const expectedOutput = 'We’re currently hard at work to make Twitter better for everyone, including developers! We’ve decided to cancel the #Chirp developer conference while we build some things that we’re excited to share with you soon.'
 
     expect(actualOutput).toBe(expectedOutput)
-  })
+  }, 10000)
 })
