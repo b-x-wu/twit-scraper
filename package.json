@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build && node ./dist/app.js",
-    "build": "npx tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "npx tsc-watch --noClear --onSuccess \"node ./out/src/app.js\"",
+    "build": "npx tsc -p tsconfig.build.json",
+    "test": "npx tsc && jest ./out/tests/*"
   },
   "keywords": [],
   "author": "",
@@ -14,10 +14,10 @@
   "dependencies": {
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "jest": "^29.4.1",
     "selenium-webdriver": "^4.8.0"
   },
   "devDependencies": {
+    "@jest/globals": "^29.4.1",
     "@types/selenium-webdriver": "^4.1.10",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "eslint": "^8.33.0",
@@ -25,6 +25,8 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.6.1",
     "eslint-plugin-promise": "^6.1.1",
+    "jest": "^29.4.1",
+    "tsc-watch": "^6.0.0",
     "typescript": "^4.9.5"
   }
 }
