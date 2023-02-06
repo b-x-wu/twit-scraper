@@ -4,11 +4,11 @@ import * as dotenv from 'dotenv'
 import { type Tweet } from './types'
 
 export class TwitterDriver {
-  driver: WebDriver | undefined
+  jobs: Array<Promise<any>> = []
   options: Options
 
   // TODO: add more options and options for non chromium webdrivers
-  constructor ({ binaryPath, headless }: { binaryPath?: string, headless?: boolean }) {
+  constructor ({ binaryPath }: { binaryPath?: string }) {
     this.options = new Options().excludeSwitches('enable-logging').headless()
     if (binaryPath == null) {
       dotenv.config()
@@ -16,31 +16,32 @@ export class TwitterDriver {
     } else {
       this.options.setChromeBinaryPath(binaryPath)
     }
-
-    if (headless != null && headless) {
-      this.options.headless()
-    }
   }
 
-  async init (): Promise<TwitterDriver> {
-    this.driver = await new Builder().forBrowser(Browser.CHROME).setChromeOptions(this.options).build()
-    return this
+  async newDriver (): Promise<WebDriver> {
+    return await new Builder().forBrowser(Browser.CHROME).setChromeOptions(this.options).build()
   }
 
-  async getTweet (id: string): Promise<Tweet> {
-    if (this.driver == null) {
-      throw new Error('Driver is uninitialized.')
-    }
+  async exec (): Promise<any> {
+    const results = await Promise.all(this.jobs)
+    this.jobs = []
+    return results
+  }
 
-    const tweetSelector = By.css('div.tweet-text')
-    await this.driver.get(`https://www.sotwe.com/tweet/${id}`)
-    await this.driver.wait(until.elementLocated(tweetSelector))
-    const tweetElement = await this.driver.findElement(tweetSelector)
-    const tweetText = (await tweetElement.getText()).trim()
-    return {
-      id,
-      text: tweetText,
-      edit_history_tweet_ids: []
-    }
+  getTweetContent (id: string): void {
+    this.jobs.push((async (): Promise<Tweet> => {
+      const driver = await this.newDriver()
+      const tweetSelector = By.css('div.tweet-text')
+      await driver.get(`https://www.sotwe.com/tweet/${id}`) // sotwe gets around age filter
+      await driver.wait(until.elementLocated(tweetSelector))
+      const tweetElement = await driver.findElement(tweetSelector)
+      const tweetText = (await tweetElement.getText()).trim()
+      await driver.close()
+      return {
+        id,
+        text: tweetText,
+        edit_history_tweet_ids: []
+      }
+    })())
   }
 }
