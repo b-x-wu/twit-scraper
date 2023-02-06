@@ -10,9 +10,12 @@ export class TwitterDriver {
   // TODO: add more options and options for non chromium webdrivers
   constructor ({ binaryPath }: { binaryPath?: string }) {
     this.options = new Options().excludeSwitches('enable-logging').headless()
+
     if (binaryPath == null) {
       dotenv.config()
-      this.options.setChromeBinaryPath(process.env.CHROME_PATH ?? './')
+      if (process.env.CHROME_PATH != null) {
+        this.options.setChromeBinaryPath(process.env.CHROME_PATH)
+      }
     } else {
       this.options.setChromeBinaryPath(binaryPath)
     }
