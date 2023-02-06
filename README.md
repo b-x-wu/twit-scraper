@@ -20,7 +20,7 @@ interface Entity {
 interface Tweet {
     id: string
     text: string
-    // skipping edit_history_tweet_ids
+    edit_history_tweet_ids: string[]
     attachments?: {
         poll_ids?: string[]
         media_keys?: string[]
@@ -29,7 +29,11 @@ interface Tweet {
     // skipping context_annotations
     conversation_id?: string
     created_at: string // in the iso-8601 format
-    // skipping edit controls
+    edit_controls?: {
+        edits_remaining: number
+        is_edit_eligible: boolean
+        editable_until: string // in the iso-8601 format
+    }
     entities?: {
         cashtags?: Entity[]
         hashtags?: Entity[]
