@@ -12,13 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "selenium-webdriver": "^4.8.0"
+    "puppeteer": "^19.6.3"
   },
   "devDependencies": {
     "@jest/globals": "^29.4.1",
-    "@types/selenium-webdriver": "^4.1.10",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "eslint": "^8.33.0",
     "eslint-config-standard-with-typescript": "^34.0.0",

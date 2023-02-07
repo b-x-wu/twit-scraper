@@ -1,6 +1,8 @@
-import { TwitterDriver } from './twitterDriver'
+import { TweetGetter } from './tweetGetter'
 
-const twitterDriver = new TwitterDriver({})
-twitterDriver.getTweetContent('1460323737035677698')
-twitterDriver.getTweetHistoryIds('1460323737035677698')
-twitterDriver.exec().then(console.log).catch(console.log)
+const tweetGetter = new TweetGetter()
+console.log('start')
+void (async () => {
+  await tweetGetter.init('1460323737035677698')
+  console.log(tweetGetter.tweet)
+})()

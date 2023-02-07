@@ -1,37 +1,21 @@
-import { TwitterDriver } from '../src/twitterDriver'
+import { TweetGetter } from '../src/tweetGetter'
 import { describe, expect, test } from '@jest/globals'
 
-describe('get tweet', () => {
-  test('gets correct tweet content', async () => {
-    const twitterDriver = new TwitterDriver({})
-    twitterDriver.getTweetContent('1460323737035677698')
+describe('TweetGetter', () => {
+  test('gets correct base tweet', async () => {
+    const tweetGetter = new TweetGetter()
+    await tweetGetter.init('1460323737035677698')
 
-    const actualOutput = (await twitterDriver.exec())[0].text
-    const expectedOutput = 'Introducing a new era for the Twitter Developer Platform! 📣The Twitter API v2 is now the primary API and full of new features ⏱Immediate access for most use cases, or apply to get more access for free 📖Removed certain restrictions in the Policy https://t.co/Hrm15bkBWJ https://t.co/YFfCDErHsg'
+    const expectedOutputId = '1460323737035677698'
+    const expectedOutputText = 'Introducing a new era for the Twitter Developer Platform! \n' +
+      '\n' +
+      '📣The Twitter API v2 is now the primary API and full of new features\n' +
+      '⏱Immediate access for most use cases, or apply to get more access for free\n' +
+      '📖Removed certain restrictions in the Policy\n' +
+      'https://t.co/Hrm15bkBWJ https://t.co/YFfCDErHsg'
+    const expectedEditHistoryTweetIds = ['1460323737035677698']
 
-    expect(actualOutput).toBe(expectedOutput)
-  }, 10000)
-
-  test('gets correct tweet history ids for tweet with no history', async () => {
-    const twitterDriver = new TwitterDriver({})
-    twitterDriver.getTweetHistoryIds('1460323737035677698')
-
-    const actualOutput = (await twitterDriver.exec())[0]
-    const expectedOutput = '1460323737035677698'
-
-    expect(actualOutput.length).toBe(1)
-    expect(actualOutput[0]).toBe(expectedOutput)
-  }, 10000)
-
-  test('gets correct tweet history ids for tweet with history', async () => {
-    const twitterDriver = new TwitterDriver({})
-    twitterDriver.getTweetHistoryIds('1622579998346608641')
-
-    const actualOutput = (await twitterDriver.exec())[0]
-    const expectedOutput = ['1622579998346608641', '1622579699498254338']
-
-    expect(actualOutput.length).toBe(2)
-    expect(actualOutput[0]).toBe(expectedOutput[0])
-    expect(actualOutput[1]).toBe(expectedOutput[1])
-  }, 10000)
+    expect(tweetGetter.tweet).toStrictEqual({ id: expectedOutputId, text: expectedOutputText, edit_history_tweet_ids: expectedEditHistoryTweetIds })
+    expect(tweetGetter.id).toBe(expectedOutputId)
+  })
 })
