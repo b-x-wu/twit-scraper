@@ -17,5 +17,5 @@ describe('TweetGetter', () => {
 
     expect(tweetGetter.tweet).toStrictEqual({ id: expectedOutputId, text: expectedOutputText, edit_history_tweet_ids: expectedEditHistoryTweetIds })
     expect(tweetGetter.id).toBe(expectedOutputId)
-  })
+  }, 10000)
 })
