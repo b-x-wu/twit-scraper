@@ -1,14 +1,15 @@
-import { TweetGetter } from '../src/tweetGetter'
-import { beforeAll, describe, expect, test } from '@jest/globals'
+import { TweetBuilder } from '../src/tweetBuilder'
+import { beforeEach, describe, expect, test } from '@jest/globals'
 
 describe('TweetGetter', () => {
-  let tweetGetter: TweetGetter
-  beforeAll(async () => {
-    tweetGetter = new TweetGetter()
-    await tweetGetter.init('1460323737035677698')
-  }, 10000)
+  let tweetBuilder: TweetBuilder
+  beforeEach(async () => {
+    tweetBuilder = new TweetBuilder('1460323737035677698')
+  })
 
   test('gets correct base tweet', async () => {
+    const actualTweet = await tweetBuilder.build()
+
     const expectedOutputId = '1460323737035677698'
     const expectedOutputText = 'Introducing a new era for the Twitter Developer Platform! \n' +
       '\n' +
@@ -18,28 +19,28 @@ describe('TweetGetter', () => {
       'https://t.co/Hrm15bkBWJ https://t.co/YFfCDErHsg'
     const expectedEditHistoryTweetIds = ['1460323737035677698']
 
-    expect(tweetGetter.tweet).toStrictEqual({ id: expectedOutputId, text: expectedOutputText, edit_history_tweet_ids: expectedEditHistoryTweetIds })
-    expect(tweetGetter.id).toBe(expectedOutputId)
-  })
+    expect(actualTweet).toStrictEqual({ id: expectedOutputId, text: expectedOutputText, edit_history_tweet_ids: expectedEditHistoryTweetIds })
+    expect(tweetBuilder.id).toBe(expectedOutputId)
+  }, 10000)
 
   test('gets correct created_at', async () => {
-    await tweetGetter.getCreatedAt()
+    const actualTweet = await tweetBuilder.getCreatedAt().build()
 
     const expectedCreatedAt = '2021-11-15T19:08:05.000Z'
 
-    expect(tweetGetter.tweet?.created_at).toBe(expectedCreatedAt)
-  })
+    expect(actualTweet.created_at).toBe(expectedCreatedAt)
+  }, 10000)
 
   test('gets correct author id', async () => {
-    await tweetGetter.getAuthorId()
+    const actualTweet = await tweetBuilder.getAuthorId().build()
 
     const expectedAuthorId = '2244994945'
 
-    expect(tweetGetter.tweet?.author_id).toBe(expectedAuthorId)
-  })
+    expect(actualTweet.author_id).toBe(expectedAuthorId)
+  }, 10000)
 
   test('gets correct edit controls', async () => {
-    await tweetGetter.getEditControls()
+    const actualTweet = await tweetBuilder.getEditControls().build()
 
     const expectedEditableUntil = '2021-11-15T19:38:05.069Z'
     const expectedIsEditEligible = true
@@ -50,6 +51,6 @@ describe('TweetGetter', () => {
       edits_remaining: expectedEditsRemaining
     }
 
-    expect(tweetGetter.tweet?.edit_controls).toStrictEqual(expectedEditControls)
-  })
+    expect(actualTweet.edit_controls).toStrictEqual(expectedEditControls)
+  }, 10000)
 })

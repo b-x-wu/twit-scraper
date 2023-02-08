@@ -1,15 +1,19 @@
 import { type Tweet } from './types'
 import puppeteer from 'puppeteer'
 
-export class TweetGetter {
+export class TweetBuilder {
   tweetData: any
-  id: string | undefined
+  id: string
   tweet: Tweet | undefined
   verbose: boolean = false
+  jobs: Array<() => Promise<void>> = []
 
-  async init (id: string, verbose?: boolean): Promise<void> {
+  constructor (id: string, verbose?: boolean) {
     this.id = id
     this.verbose = verbose ?? false
+  }
+
+  private async init (): Promise<void> {
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
 
@@ -36,15 +40,14 @@ export class TweetGetter {
       })()
     })
 
-    await page.goto(`https://twitter.com/x/status/${id}`)
+    await page.goto(`https://twitter.com/x/status/${this.id}`)
     await page.waitForNetworkIdle()
     await browser.close()
 
     await this.getBaseTweet()
   }
 
-  // TODO: change this to a builder model
-  async getBaseTweet (): Promise<void> {
+  private async getBaseTweet (): Promise<void> {
     if (this.id == null || this.tweetData == null) {
       throw new Error('Tweet data not initialized. Call this.init().')
     }
@@ -72,47 +75,71 @@ export class TweetGetter {
     this.tweet.edit_history_tweet_ids = editHistoryTweetIds
   }
 
-  async getCreatedAt (): Promise<void> {
-    if (this.id == null || this.tweetData == null || this.tweet == null) {
-      throw new Error('Tweet data not initialized. Call this.init().')
-    }
+  getCreatedAt (): TweetBuilder {
+    // FIXME: is this getting run before this.build?
+    this.jobs.push(async () => {
+      if (this.id == null || this.tweetData == null || this.tweet == null) {
+        throw new Error('Tweet data not initialized. Call this.init().')
+      }
 
-    const createdAt: string = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.created_at
-    if (createdAt == null) {
-      throw new Error('Error retrieving created_at data from tweet object.')
-    }
+      const createdAt: string = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.created_at
+      if (createdAt == null) {
+        throw new Error('Error retrieving created_at data from tweet object.')
+      }
 
-    const createdAtDate = new Date(createdAt)
-    this.tweet.created_at = createdAtDate.toISOString()
+      const createdAtDate = new Date(createdAt)
+      this.tweet.created_at = createdAtDate.toISOString()
+    })
+
+    return this
   }
 
-  async getAuthorId (): Promise<void> {
-    if (this.id == null || this.tweetData == null || this.tweet == null) {
-      throw new Error('Tweet data not initialized. Call this.init().')
-    }
+  getAuthorId (): TweetBuilder {
+    this.jobs.push(async () => {
+      if (this.id == null || this.tweetData == null || this.tweet == null) {
+        throw new Error('Tweet data not initialized. Call this.init().')
+      }
 
-    const authorId: string = this.tweetData.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.rest_id
-    if (authorId == null) {
-      throw new Error('Error retrieving author_id data from tweet object.')
-    }
+      const authorId: string = this.tweetData.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.rest_id
+      if (authorId == null) {
+        throw new Error('Error retrieving author_id data from tweet object.')
+      }
 
-    this.tweet.author_id = authorId
+      this.tweet.author_id = authorId
+    })
+
+    return this
   }
 
-  async getEditControls (): Promise<void> {
-    if (this.id == null || this.tweetData == null || this.tweet == null) {
-      throw new Error('Tweet data not initialized. Call this.init().')
+  getEditControls (): TweetBuilder {
+    this.jobs.push(async () => {
+      if (this.id == null || this.tweetData == null || this.tweet == null) {
+        throw new Error('Tweet data not initialized. Call this.init().')
+      }
+
+      const editControls: any = this.tweetData.content?.itemContent?.tweet_results?.result?.edit_control
+      const editableUntilMsecs: string = editControls?.editable_until_msecs
+      const isEditEligible: boolean = editControls?.is_edit_eligible
+      const editsRemaining: string = editControls?.edits_remaining
+
+      this.tweet.edit_controls = {
+        editable_until: (new Date(parseInt(editableUntilMsecs))).toISOString(),
+        is_edit_eligible: isEditEligible,
+        edits_remaining: parseInt(editsRemaining)
+      }
+    })
+
+    return this
+  }
+
+  async build (): Promise<Tweet> {
+    await this.init()
+    await Promise.all(this.jobs.map(async (job) => { await job.call(this) }))
+
+    if (this.tweet == null) {
+      throw new Error('Error building tweet')
     }
 
-    const editControls: any = this.tweetData.content?.itemContent?.tweet_results?.result?.edit_control
-    const editableUntilMsecs: string = editControls?.editable_until_msecs
-    const isEditEligible: boolean = editControls?.is_edit_eligible
-    const editsRemaining: string = editControls?.edits_remaining
-
-    this.tweet.edit_controls = {
-      editable_until: (new Date(parseInt(editableUntilMsecs))).toISOString(),
-      is_edit_eligible: isEditEligible,
-      edits_remaining: parseInt(editsRemaining)
-    }
+    return this.tweet
   }
 }
