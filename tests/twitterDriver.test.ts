@@ -1,11 +1,14 @@
 import { TweetGetter } from '../src/tweetGetter'
-import { describe, expect, test } from '@jest/globals'
+import { beforeAll, describe, expect, test } from '@jest/globals'
 
 describe('TweetGetter', () => {
-  test('gets correct base tweet', async () => {
-    const tweetGetter = new TweetGetter()
+  let tweetGetter: TweetGetter
+  beforeAll(async () => {
+    tweetGetter = new TweetGetter()
     await tweetGetter.init('1460323737035677698')
+  })
 
+  test('gets correct base tweet', async () => {
     const expectedOutputId = '1460323737035677698'
     const expectedOutputText = 'Introducing a new era for the Twitter Developer Platform! \n' +
       '\n' +
@@ -17,5 +20,13 @@ describe('TweetGetter', () => {
 
     expect(tweetGetter.tweet).toStrictEqual({ id: expectedOutputId, text: expectedOutputText, edit_history_tweet_ids: expectedEditHistoryTweetIds })
     expect(tweetGetter.id).toBe(expectedOutputId)
-  }, 10000)
+  })
+
+  test('gets correct created_at', async () => {
+    await tweetGetter.getCreatedAt()
+
+    const expectedCreatedAt = '2021-11-15T19:08:05.000Z'
+
+    expect(tweetGetter.tweet?.created_at).toBe(expectedCreatedAt)
+  })
 })

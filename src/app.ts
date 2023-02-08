@@ -3,6 +3,12 @@ import { TweetGetter } from './tweetGetter'
 const tweetGetter = new TweetGetter()
 console.log('start')
 void (async () => {
-  await tweetGetter.init('1460323737035677698')
-  console.log(tweetGetter.tweet)
+  try {
+    // await tweetGetter.init('1622000934535725057') // age restricted tweet
+    await tweetGetter.init('1460323737035677698')
+    await tweetGetter.getCreatedAt()
+    console.log(tweetGetter.tweet)
+  } catch (e: any) {
+    console.log(e.toString())
+  }
 })()
