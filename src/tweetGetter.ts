@@ -43,13 +43,14 @@ export class TweetGetter {
     await this.getBaseTweet()
   }
 
+  // TODO: change this to a builder model
   async getBaseTweet (): Promise<void> {
     if (this.id == null || this.tweetData == null) {
       throw new Error('Tweet data not initialized. Call this.init().')
     }
 
+    // TODO: figure out what to do with age restricted tweets
     if (this.tweetData.content?.itemContent?.tweet_results?.result?.__typename === 'TweetTombstone') {
-      // TODO: figure out what to do with age restricted tweets
       throw new Error('Encountered tombstone instead of tweet. Tweet may be age restricted')
     }
 
@@ -83,5 +84,35 @@ export class TweetGetter {
 
     const createdAtDate = new Date(createdAt)
     this.tweet.created_at = createdAtDate.toISOString()
+  }
+
+  async getAuthorId (): Promise<void> {
+    if (this.id == null || this.tweetData == null || this.tweet == null) {
+      throw new Error('Tweet data not initialized. Call this.init().')
+    }
+
+    const authorId: string = this.tweetData.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.rest_id
+    if (authorId == null) {
+      throw new Error('Error retrieving author_id data from tweet object.')
+    }
+
+    this.tweet.author_id = authorId
+  }
+
+  async getEditControls (): Promise<void> {
+    if (this.id == null || this.tweetData == null || this.tweet == null) {
+      throw new Error('Tweet data not initialized. Call this.init().')
+    }
+
+    const editControls: any = this.tweetData.content?.itemContent?.tweet_results?.result?.edit_control
+    const editableUntilMsecs: string = editControls?.editable_until_msecs
+    const isEditEligible: boolean = editControls?.is_edit_eligible
+    const editsRemaining: string = editControls?.edits_remaining
+
+    this.tweet.edit_controls = {
+      editable_until: (new Date(parseInt(editableUntilMsecs))).toISOString(),
+      is_edit_eligible: isEditEligible,
+      edits_remaining: parseInt(editsRemaining)
+    }
   }
 }

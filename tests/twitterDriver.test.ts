@@ -29,4 +29,27 @@ describe('TweetGetter', () => {
 
     expect(tweetGetter.tweet?.created_at).toBe(expectedCreatedAt)
   })
+
+  test('gets correct author id', async () => {
+    await tweetGetter.getAuthorId()
+
+    const expectedAuthorId = '2244994945'
+
+    expect(tweetGetter.tweet?.author_id).toBe(expectedAuthorId)
+  })
+
+  test('gets correct edit controls', async () => {
+    await tweetGetter.getEditControls()
+
+    const expectedEditableUntil = '2021-11-15T19:38:05.069Z'
+    const expectedIsEditEligible = true
+    const expectedEditsRemaining = 5
+    const expectedEditControls = {
+      editable_until: expectedEditableUntil,
+      is_edit_eligible: expectedIsEditEligible,
+      edits_remaining: expectedEditsRemaining
+    }
+
+    expect(tweetGetter.tweet?.edit_controls).toStrictEqual(expectedEditControls)
+  })
 })
