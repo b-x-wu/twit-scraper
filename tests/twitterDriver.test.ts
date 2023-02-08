@@ -6,7 +6,7 @@ describe('TweetGetter', () => {
   beforeAll(async () => {
     tweetGetter = new TweetGetter()
     await tweetGetter.init('1460323737035677698')
-  })
+  }, 10000)
 
   test('gets correct base tweet', async () => {
     const expectedOutputId = '1460323737035677698'
