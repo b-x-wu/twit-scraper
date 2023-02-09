@@ -25,6 +25,14 @@ export enum ReferencedTweetTypes {
   QUOTED = 'quoted'
 }
 
+export interface PublicMetrics {
+  retweet_count: number
+  reply_count: number
+  like_count: number
+  quote_count: number
+  impression_count?: number
+}
+
 export interface Tweet {
   id: string
   text: string
@@ -50,8 +58,11 @@ export interface Tweet {
     mentions?: Mention[]
     urls?: Url[]
   }
+  // TODO: figure out what to do with withheld content information
+  //       right now, finding tweets to test on makes me very uncomfy
   in_reply_to_user_id?: string
   lang?: string // BCP47 language tag
+  public_metrics?: PublicMetrics
   organic_metrics?: {
     impression_count: number
     like_count: number

@@ -152,4 +152,22 @@ describe('TweetGetter', () => {
 
     expect(actualTweet.entities).toStrictEqual(expectedEntities)
   }, 10000)
+
+  test('gets correct public metrics', async () => {
+    const actualTweet = await (new TweetBuilder('1623563614979325952'))
+      .getPublicMetrics()
+      .build()
+
+    const expectedLikeCount = 1508
+    const expectedRetweetCount = 99
+    const expectedReplyCount = 8
+    const expectedQuoteCount = 6
+    const expectedImpressionCount = 93816
+
+    expect(actualTweet.public_metrics?.like_count).toBeGreaterThanOrEqual(expectedLikeCount)
+    expect(actualTweet.public_metrics?.retweet_count).toBeGreaterThanOrEqual(expectedRetweetCount)
+    expect(actualTweet.public_metrics?.reply_count).toBeGreaterThanOrEqual(expectedReplyCount)
+    expect(actualTweet.public_metrics?.quote_count).toBeGreaterThanOrEqual(expectedQuoteCount)
+    expect(actualTweet.public_metrics?.impression_count).toBeGreaterThanOrEqual(expectedImpressionCount)
+  })
 })

@@ -1,4 +1,4 @@
-import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention } from './types'
+import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention, type PublicMetrics } from './types'
 import puppeteer from 'puppeteer'
 
 export class TweetBuilder {
@@ -271,6 +271,40 @@ export class TweetBuilder {
 
       if (this.tweet != null) {
         this.tweet.entities = entities
+      }
+    })
+
+    return this
+  }
+
+  getPublicMetrics (): TweetBuilder {
+    this.jobs.push(async () => {
+      const likeCount: number = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.favorite_count
+      const retweetCount: number = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.retweet_count
+      const replyCount: number = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.reply_count
+      const quoteCount: number = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.quote_count
+
+      if (likeCount == null || retweetCount == null || replyCount == null || quoteCount == null) {
+        throw new Error('Error retrieving public metrics.')
+      }
+      const publicMetrics: PublicMetrics = {
+        like_count: likeCount,
+        retweet_count: retweetCount,
+        reply_count: replyCount,
+        quote_count: quoteCount
+      }
+
+      const viewCount: string = this.tweetData.content?.itemContent?.tweet_results?.result?.views?.count
+      if (viewCount == null) {
+        if (this.verbose) {
+          console.log('No view count available. This tweet may have been tweeted before view count implementation.')
+        }
+      } else {
+        publicMetrics.impression_count = parseInt(viewCount)
+      }
+
+      if (this.tweet != null) {
+        this.tweet.public_metrics = publicMetrics
       }
     })
 
