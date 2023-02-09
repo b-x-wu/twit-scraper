@@ -4,6 +4,12 @@ export interface Entity {
   tag: string
 }
 
+export enum ReferencedTweetTypes {
+  RETWEETED = 'retweeted',
+  REPLIED_TO = 'replied_to',
+  QUOTED = 'quoted'
+}
+
 export interface Tweet {
   id: string
   text: string
@@ -33,14 +39,14 @@ export interface Tweet {
   in_reply_to_user_id?: string
   lang?: string // BCP47 language tag
   organic_metrics?: {
-    impression_count: number // TODO: should this be replaced with view count?
+    impression_count: number
     like_count: number
     reply_count: number
     retweet_count: number
   }
-  possibly_sensitive?: true
+  possibly_sensitive?: boolean
   referenced_tweets?: Array<{
-    type: 'replied_to' | 'quoted'
+    type: ReferencedTweetTypes
     id: string
   }>
 }

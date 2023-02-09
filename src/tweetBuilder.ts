@@ -1,4 +1,4 @@
-import { type Tweet } from './types'
+import { ReferencedTweetTypes, type Tweet } from './types'
 import puppeteer from 'puppeteer'
 
 export class TweetBuilder {
@@ -155,6 +155,47 @@ export class TweetBuilder {
       }
 
       this.tweet.in_reply_to_user_id = inReplyToUserId
+    })
+
+    return this
+  }
+
+  getReferencedTweets (): TweetBuilder {
+    this.jobs.push(async () => {
+      if (this.id == null || this.tweetData == null || this.tweet == null) {
+        throw new Error('Tweet data not initialized.')
+      }
+
+      const referencedTweets: Array<{ type: ReferencedTweetTypes, id: string }> = []
+
+      // check for quoted
+      const quotedStatusId = this.tweetData.content?.itemContent?.tweet_results?.result?.quoted_status_result?.result?.rest_id
+      if (quotedStatusId != null) {
+        referencedTweets.push({
+          type: ReferencedTweetTypes.QUOTED,
+          id: quotedStatusId
+        })
+      }
+
+      // check for replied
+      const repliedToId = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.in_reply_to_status_id_str
+      if (repliedToId != null) {
+        referencedTweets.push({
+          type: ReferencedTweetTypes.REPLIED_TO,
+          id: repliedToId
+        })
+      }
+
+      // check for retweet
+      const retweetedId = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.retweeted_status_result?.result?.rest_id
+      if (retweetedId != null) {
+        referencedTweets.push({
+          type: ReferencedTweetTypes.RETWEETED,
+          id: retweetedId
+        })
+      }
+
+      this.tweet.referenced_tweets = referencedTweets
     })
 
     return this

@@ -1,14 +1,9 @@
 import { TweetBuilder } from '../src/tweetBuilder'
-import { beforeEach, describe, expect, test } from '@jest/globals'
+import { describe, expect, test } from '@jest/globals'
 
 describe('TweetGetter', () => {
-  let tweetBuilder: TweetBuilder
-  beforeEach(async () => {
-    tweetBuilder = new TweetBuilder('1460323737035677698')
-  })
-
   test('gets correct base tweet', async () => {
-    const actualTweet = await tweetBuilder.build()
+    const actualTweet = await (new TweetBuilder('1460323737035677698')).build()
 
     const expectedOutputId = '1460323737035677698'
     const expectedOutputText = 'Introducing a new era for the Twitter Developer Platform! \n' +
@@ -20,11 +15,10 @@ describe('TweetGetter', () => {
     const expectedEditHistoryTweetIds = ['1460323737035677698']
 
     expect(actualTweet).toStrictEqual({ id: expectedOutputId, text: expectedOutputText, edit_history_tweet_ids: expectedEditHistoryTweetIds })
-    expect(tweetBuilder.id).toBe(expectedOutputId)
   }, 10000)
 
   test('gets correct created_at', async () => {
-    const actualTweet = await tweetBuilder.getCreatedAt().build()
+    const actualTweet = await (new TweetBuilder('1460323737035677698')).getCreatedAt().build()
 
     const expectedCreatedAt = '2021-11-15T19:08:05.000Z'
 
@@ -32,7 +26,7 @@ describe('TweetGetter', () => {
   }, 10000)
 
   test('gets correct author id', async () => {
-    const actualTweet = await tweetBuilder.getAuthorId().build()
+    const actualTweet = await (new TweetBuilder('1460323737035677698')).getAuthorId().build()
 
     const expectedAuthorId = '2244994945'
 
@@ -40,7 +34,7 @@ describe('TweetGetter', () => {
   }, 10000)
 
   test('gets correct edit controls', async () => {
-    const actualTweet = await tweetBuilder.getEditControls().build()
+    const actualTweet = await (new TweetBuilder('1460323737035677698')).getEditControls().build()
 
     const expectedEditableUntil = '2021-11-15T19:38:05.069Z'
     const expectedIsEditEligible = true
@@ -55,7 +49,7 @@ describe('TweetGetter', () => {
   }, 10000)
 
   test('gets correct conversation id', async () => {
-    const actualTweet = await tweetBuilder.getConversationId().build()
+    const actualTweet = await (new TweetBuilder('1460323737035677698')).getConversationId().build()
 
     const expectedConversationId = '1460323737035677698'
 
@@ -80,5 +74,28 @@ describe('TweetGetter', () => {
     const expectedInResponseToUserId = '5162861'
 
     expect(actualResponseTweet.in_reply_to_user_id).toBe(expectedInResponseToUserId)
+  }, 10000)
+
+  test('gets correct quoted and replied to referenced tweets', async () => {
+    const actualResponseTweet = await (new TweetBuilder('1263155690476011523'))
+      .getReferencedTweets()
+      .build()
+
+    const expectedReferencedTweets = [
+      { type: 'quoted', id: '1263154811236749313' },
+      { type: 'replied_to', id: '1263145271946551300' }
+    ]
+
+    expect(actualResponseTweet.referenced_tweets).toStrictEqual(expectedReferencedTweets)
+  }, 10000)
+
+  test('gets correct retweeted referenced tweets', async () => {
+    const actualResponseTweet = await (new TweetBuilder('1623202372360208386'))
+      .getReferencedTweets()
+      .build()
+
+    const expectedReferencedTweets = [{ type: 'retweeted', id: '1622981513959669762' }]
+
+    expect(actualResponseTweet.referenced_tweets).toStrictEqual(expectedReferencedTweets)
   }, 10000)
 })
