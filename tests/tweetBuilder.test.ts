@@ -169,5 +169,5 @@ describe('TweetGetter', () => {
     expect(actualTweet.public_metrics?.reply_count).toBeGreaterThanOrEqual(expectedReplyCount)
     expect(actualTweet.public_metrics?.quote_count).toBeGreaterThanOrEqual(expectedQuoteCount)
     expect(actualTweet.public_metrics?.impression_count).toBeGreaterThanOrEqual(expectedImpressionCount)
-  })
+  }, 10000)
 })
