@@ -71,4 +71,14 @@ describe('TweetGetter', () => {
 
     expect(actualResponseTweet.conversation_id).toBe(expectedConversationId)
   }, 10000)
+
+  test('gets correct in response to user id', async () => {
+    const actualResponseTweet = await (new TweetBuilder('1623460456898744320'))
+      .getInReplyToUserId()
+      .build()
+
+    const expectedInResponseToUserId = '5162861'
+
+    expect(actualResponseTweet.in_reply_to_user_id).toBe(expectedInResponseToUserId)
+  }, 10000)
 })

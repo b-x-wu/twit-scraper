@@ -34,7 +34,6 @@ export class TweetBuilder {
               })
           } catch (e: any) {
             if (this.verbose) {
-              console.log(e)
               console.log('Error getting data from response. Likely a preflight request. Skipping...')
             }
           }
@@ -147,7 +146,13 @@ export class TweetBuilder {
         throw new Error('Tweet data not initialized.')
       }
 
-      const inReplyToUserId = this.tweetData.content?.itemContent?.tweet_results?.reslut?.legacy?.in_reply_to_user_id_str
+      const inReplyToUserId = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.in_reply_to_user_id_str
+      if (inReplyToUserId == null) {
+        if (this.verbose) {
+          console.log('This tweet is not in response to a user. No "in_reply_to_user_id" field added.')
+        }
+        return
+      }
 
       this.tweet.in_reply_to_user_id = inReplyToUserId
     })
