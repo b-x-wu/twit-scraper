@@ -107,7 +107,7 @@ describe('TweetGetter', () => {
     const expectedAttachments = { poll_ids: ['1623364561951678468'] }
 
     expect(actualTweet.attachments).toStrictEqual(expectedAttachments)
-  })
+  }, 10000)
 
   test('gets correct attachments media keys', async () => {
     const actualTweet = await (new TweetBuilder('1619500153337171968'))
@@ -117,7 +117,7 @@ describe('TweetGetter', () => {
     const expectedAttachments = { media_keys: ['3_1619500025255714817', '3_1619500012597313536'] }
 
     expect(actualTweet.attachments).toStrictEqual(expectedAttachments)
-  })
+  }, 10000)
 
   test('gets correct entities', async () => {
     const actualTweet = await (new TweetBuilder('1620933138598993924'))
@@ -151,5 +151,5 @@ describe('TweetGetter', () => {
     }
 
     expect(actualTweet.entities).toStrictEqual(expectedEntities)
-  })
+  }, 10000)
 })
