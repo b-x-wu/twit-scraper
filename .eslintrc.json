@@ -6,6 +6,7 @@
     "extends": "standard-with-typescript",
     "overrides": [
     ],
+    "ignorePatterns": ["dist/**/*", "out/**/*"],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module",

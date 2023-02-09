@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "npx tsc-watch --noClear --onSuccess \"node ./out/src/app.js\"",
     "build": "npx tsc -p tsconfig.build.json",
-    "test": "npx tsc && jest ./out/tests/*"
+    "test": "npx tsc && jest ./out/tests/*",
+    "lint": "npx eslint ."
   },
   "keywords": [],
   "author": "",
