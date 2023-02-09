@@ -3,7 +3,7 @@ import { describe, expect, test } from '@jest/globals'
 import { ReplySettings } from '../src/types'
 
 describe('TweetGetter', () => {
-  test.concurrent('gets correct base tweet', async () => {
+  test('gets correct base tweet', async () => {
     const actualTweet = await (new TweetBuilder('1460323737035677698')).build()
 
     const expectedOutputId = '1460323737035677698'
@@ -18,7 +18,7 @@ describe('TweetGetter', () => {
     expect(actualTweet).toStrictEqual({ id: expectedOutputId, text: expectedOutputText, edit_history_tweet_ids: expectedEditHistoryTweetIds })
   }, 10000)
 
-  test.concurrent('gets correct created_at', async () => {
+  test('gets correct created_at', async () => {
     const actualTweet = await (new TweetBuilder('1460323737035677698')).getCreatedAt().build()
 
     const expectedCreatedAt = '2021-11-15T19:08:05.000Z'
@@ -26,7 +26,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.created_at).toBe(expectedCreatedAt)
   }, 10000)
 
-  test.concurrent('gets correct author id', async () => {
+  test('gets correct author id', async () => {
     const actualTweet = await (new TweetBuilder('1460323737035677698')).getAuthorId().build()
 
     const expectedAuthorId = '2244994945'
@@ -34,7 +34,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.author_id).toBe(expectedAuthorId)
   }, 10000)
 
-  test.concurrent('gets correct edit controls', async () => {
+  test('gets correct edit controls', async () => {
     const actualTweet = await (new TweetBuilder('1460323737035677698')).getEditControls().build()
 
     const expectedEditableUntil = '2021-11-15T19:38:05.069Z'
@@ -49,7 +49,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.edit_controls).toStrictEqual(expectedEditControls)
   }, 10000)
 
-  test.concurrent('gets correct conversation id', async () => {
+  test('gets correct conversation id', async () => {
     const actualTweet = await (new TweetBuilder('1460323737035677698')).getConversationId().build()
 
     const expectedConversationId = '1460323737035677698'
@@ -57,7 +57,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.conversation_id).toBe(expectedConversationId)
   }, 10000)
 
-  test.concurrent('gets correct conversation id for response', async () => {
+  test('gets correct conversation id for response', async () => {
     const actualResponseTweet = await (new TweetBuilder('1623463792700014595'))
       .getConversationId()
       .build()
@@ -67,7 +67,7 @@ describe('TweetGetter', () => {
     expect(actualResponseTweet.conversation_id).toBe(expectedConversationId)
   }, 10000)
 
-  test.concurrent('gets correct in response to user id', async () => {
+  test('gets correct in response to user id', async () => {
     const actualResponseTweet = await (new TweetBuilder('1623460456898744320'))
       .getInReplyToUserId()
       .build()
@@ -77,7 +77,7 @@ describe('TweetGetter', () => {
     expect(actualResponseTweet.in_reply_to_user_id).toBe(expectedInResponseToUserId)
   }, 10000)
 
-  test.concurrent('gets correct quoted and replied to referenced tweets', async () => {
+  test('gets correct quoted and replied to referenced tweets', async () => {
     const actualResponseTweet = await (new TweetBuilder('1263155690476011523'))
       .getReferencedTweets()
       .build()
@@ -90,7 +90,7 @@ describe('TweetGetter', () => {
     expect(actualResponseTweet.referenced_tweets).toStrictEqual(expectedReferencedTweets)
   }, 10000)
 
-  test.concurrent('gets correct retweeted referenced tweets', async () => {
+  test('gets correct retweeted referenced tweets', async () => {
     const actualResponseTweet = await (new TweetBuilder('1623202372360208386'))
       .getReferencedTweets()
       .build()
@@ -100,7 +100,7 @@ describe('TweetGetter', () => {
     expect(actualResponseTweet.referenced_tweets).toStrictEqual(expectedReferencedTweets)
   }, 10000)
 
-  test.concurrent('gets correct attachments poll ids', async () => {
+  test('gets correct attachments poll ids', async () => {
     const actualTweet = await (new TweetBuilder('1623364562601885696'))
       .getAttachments()
       .build()
@@ -110,7 +110,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.attachments).toStrictEqual(expectedAttachments)
   }, 10000)
 
-  test.concurrent('gets correct attachments media keys', async () => {
+  test('gets correct attachments media keys', async () => {
     const actualTweet = await (new TweetBuilder('1619500153337171968'))
       .getAttachments()
       .build()
@@ -120,7 +120,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.attachments).toStrictEqual(expectedAttachments)
   }, 10000)
 
-  test.concurrent('gets correct entities', async () => {
+  test('gets correct entities', async () => {
     const actualTweet = await (new TweetBuilder('1620933138598993924'))
       .getEntities()
       .build()
@@ -154,7 +154,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.entities).toStrictEqual(expectedEntities)
   }, 10000)
 
-  test.concurrent('gets correct public metrics', async () => {
+  test('gets correct public metrics', async () => {
     const actualTweet = await (new TweetBuilder('1623563614979325952'))
       .getPublicMetrics()
       .build()
@@ -172,7 +172,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.public_metrics?.impression_count).toBeGreaterThanOrEqual(expectedImpressionCount)
   }, 10000)
 
-  test.concurrent('gets correct possibly sensitive', async () => {
+  test('gets correct possibly sensitive', async () => {
     const actualTweet = await (new TweetBuilder('1623563614979325952'))
       .getIsPossiblySensitive()
       .build()
@@ -182,7 +182,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.possibly_sensitive).toBe(expectedIsPossiblySensitive)
   })
 
-  test.concurrent('gets correct language', async () => {
+  test('gets correct language', async () => {
     const actualTweet = await (new TweetBuilder('1623713798292111360'))
       .getLanguage()
       .build()
@@ -192,7 +192,7 @@ describe('TweetGetter', () => {
     expect(actualTweet.lang).toBe(expectedLanguage)
   })
 
-  test.concurrent('gets correct reply settings', async () => {
+  test('gets correct reply settings', async () => {
     const actualTweet = await (new TweetBuilder('1529447517645025280'))
       .getReplySettings()
       .build()
