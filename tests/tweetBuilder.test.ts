@@ -118,4 +118,38 @@ describe('TweetGetter', () => {
 
     expect(actualTweet.attachments).toStrictEqual(expectedAttachments)
   })
+
+  test('gets correct entities', async () => {
+    const actualTweet = await (new TweetBuilder('1620933138598993924'))
+      .getEntities()
+      .build()
+
+    const expectedEntities = {
+      hashtags: [
+        {
+          start: 229,
+          end: 243,
+          tag: 'ClimateAction'
+        }
+      ],
+      mentions: [
+        {
+          start: 3,
+          end: 3,
+          username: 'Google'
+        }
+      ],
+      urls: [
+        {
+          display_url: 'youtube.com/watch?v=IeyV56…',
+          expanded_url: 'https://www.youtube.com/watch?v=IeyV56WBOzE',
+          url: 'https://t.co/qKmDoah3p6',
+          start: 205,
+          end: 228
+        }
+      ]
+    }
+
+    expect(actualTweet.entities).toStrictEqual(expectedEntities)
+  })
 })

@@ -1,7 +1,22 @@
-export interface Entity {
+export interface Hashtag {
   start: number
   end: number
   tag: string
+}
+
+export interface Mention {
+  start: number
+  end: number
+  username: string
+}
+
+export interface Url {
+  start: number
+  end: number
+  url: string
+  expanded_url: string
+  display_url: string
+  // TODO: should there be an unwound url field here?
 }
 
 export enum ReferencedTweetTypes {
@@ -26,15 +41,14 @@ export interface Tweet {
     is_edit_eligible: boolean
     editable_until: string // in the iso-8601 format
   }
+  // TODO: find some way to get geo information
+  // TODO: find some way to get context annotations
   entities?: {
-    cashtags?: Entity[]
-    hashtags?: Entity[]
-    mentions?: Entity[]
-    urls?: Array<{
-      start: number
-      end: number
-      url: string
-    }>
+    // TODO: find some way to get annotations
+    // TODO: I cant find an endpoint where cashtags exist
+    hashtags?: Hashtag[]
+    mentions?: Mention[]
+    urls?: Url[]
   }
   in_reply_to_user_id?: string
   lang?: string // BCP47 language tag
@@ -59,9 +73,9 @@ export interface User {
   created_at?: string // in the iso-8601 format
   description?: string
   entities?: { // same as entities in the Tweets object, but with the user's profile description
-    cashtags?: Entity[]
-    hashtags?: Entity[]
-    mentions?: Entity[]
+    cashtags?: Hashtag[]
+    hashtags?: Hashtag[]
+    mentions?: Hashtag[]
     urls?: Array<{
       start: number
       end: number

@@ -1,4 +1,4 @@
-import { ReferencedTweetTypes, type Tweet } from './types'
+import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention } from './types'
 import puppeteer from 'puppeteer'
 
 export class TweetBuilder {
@@ -181,6 +181,13 @@ export class TweetBuilder {
         })
       }
 
+      if (referencedTweets.length === 0) {
+        if (this.verbose) {
+          console.log('This tweet has no referenced tweets.')
+        }
+        return
+      }
+
       if (this.tweet != null) {
         this.tweet.referenced_tweets = referencedTweets
       }
@@ -223,6 +230,47 @@ export class TweetBuilder {
 
       if (this.tweet != null) {
         this.tweet.attachments = attachments
+      }
+    })
+
+    return this
+  }
+
+  getEntities (): TweetBuilder {
+    this.jobs.push(async () => {
+      const entitiesData = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.entities
+      const entities: { hashtags?: Hashtag[], mentions?: Mention[], urls?: Url[] } = {}
+
+      // get hashtags
+      if (entitiesData.hashtags != null && (entitiesData.hashtags as any[]).length > 0) {
+        entities.hashtags = (entitiesData.hashtags as any[]).map(
+          hashtag => ({ start: hashtag.indices[0], end: hashtag.indices[1], tag: hashtag.text })
+        )
+      }
+
+      // get mentions
+      if (entitiesData.user_mentions != null && (entitiesData.user_mentions as any[]).length > 0) {
+        entities.mentions = (entitiesData.user_mentions as any[]).map(
+          mention => ({ start: mention.indices[0], end: mention.indices[0], username: mention.screen_name })
+        )
+      }
+
+      // get urls
+      if (entitiesData.urls != null && (entitiesData.urls as any[]).length > 0) {
+        entities.urls = (entitiesData.urls as any[]).map(
+          url => ({ display_url: url.display_url, expanded_url: url.expanded_url, url: url.url, start: url.indices[0], end: url.indices[1] })
+        )
+      }
+
+      if (Object.getOwnPropertyNames(entities).length === 0) {
+        if (this.verbose) {
+          console.log('Tweet has no entities.')
+        }
+        return
+      }
+
+      if (this.tweet != null) {
+        this.tweet.entities = entities
       }
     })
 
