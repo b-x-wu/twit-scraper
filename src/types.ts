@@ -49,6 +49,7 @@ export interface Tweet {
     type: ReferencedTweetTypes
     id: string
   }>
+  reply_settings?: 'everyone' | 'mentionedUsers' | 'following'
 }
 
 export interface User {

@@ -78,14 +78,12 @@ export class TweetBuilder {
 
   getCreatedAt (): TweetBuilder {
     this.jobs.push(async () => {
-      if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized.')
-      }
-
       const createdAt: string = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.created_at
 
       const createdAtDate = new Date(createdAt)
-      this.tweet.created_at = createdAtDate.toISOString()
+      if (this.tweet != null) {
+        this.tweet.created_at = createdAtDate.toISOString()
+      }
     })
 
     return this
@@ -93,13 +91,11 @@ export class TweetBuilder {
 
   getAuthorId (): TweetBuilder {
     this.jobs.push(async () => {
-      if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized.')
-      }
-
       const authorId: string = this.tweetData.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.rest_id
 
-      this.tweet.author_id = authorId
+      if (this.tweet != null) {
+        this.tweet.author_id = authorId
+      }
     })
 
     return this
@@ -107,19 +103,17 @@ export class TweetBuilder {
 
   getEditControls (): TweetBuilder {
     this.jobs.push(async () => {
-      if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized.')
-      }
-
       const editControls: any = this.tweetData.content?.itemContent?.tweet_results?.result?.edit_control
       const editableUntilMsecs: string = editControls?.editable_until_msecs
       const isEditEligible: boolean = editControls?.is_edit_eligible
       const editsRemaining: string = editControls?.edits_remaining
 
-      this.tweet.edit_controls = {
-        editable_until: (new Date(parseInt(editableUntilMsecs))).toISOString(),
-        is_edit_eligible: isEditEligible,
-        edits_remaining: parseInt(editsRemaining)
+      if (this.tweet != null) {
+        this.tweet.edit_controls = {
+          editable_until: (new Date(parseInt(editableUntilMsecs))).toISOString(),
+          is_edit_eligible: isEditEligible,
+          edits_remaining: parseInt(editsRemaining)
+        }
       }
     })
 
@@ -128,13 +122,11 @@ export class TweetBuilder {
 
   getConversationId (): TweetBuilder {
     this.jobs.push(async () => {
-      if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized.')
-      }
-
       const conversationId = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.conversation_id_str
 
-      this.tweet.conversation_id = conversationId
+      if (this.tweet != null) {
+        this.tweet.conversation_id = conversationId
+      }
     })
 
     return this
@@ -142,10 +134,6 @@ export class TweetBuilder {
 
   getInReplyToUserId (): TweetBuilder {
     this.jobs.push(async () => {
-      if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized.')
-      }
-
       const inReplyToUserId = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.in_reply_to_user_id_str
       if (inReplyToUserId == null) {
         if (this.verbose) {
@@ -154,7 +142,9 @@ export class TweetBuilder {
         return
       }
 
-      this.tweet.in_reply_to_user_id = inReplyToUserId
+      if (this.tweet != null) {
+        this.tweet.in_reply_to_user_id = inReplyToUserId
+      }
     })
 
     return this
@@ -162,10 +152,6 @@ export class TweetBuilder {
 
   getReferencedTweets (): TweetBuilder {
     this.jobs.push(async () => {
-      if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized.')
-      }
-
       const referencedTweets: Array<{ type: ReferencedTweetTypes, id: string }> = []
 
       // check for quoted
@@ -195,7 +181,49 @@ export class TweetBuilder {
         })
       }
 
-      this.tweet.referenced_tweets = referencedTweets
+      if (this.tweet != null) {
+        this.tweet.referenced_tweets = referencedTweets
+      }
+    })
+
+    return this
+  }
+
+  getAttachments (): TweetBuilder {
+    this.jobs.push(async () => {
+      const attachments: { media_keys?: string[], poll_ids?: string[] } = {}
+
+      // get media keys
+      const medias = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.extended_entities?.media
+      if (medias != null) {
+        const mediaKeys = medias.map((media: any) => media?.media_key).filter((mediaKey: any) => mediaKey != null)
+        if (mediaKeys.length !== 0) {
+          attachments.media_keys = mediaKeys
+        }
+      }
+
+      // get poll ids
+      const card = this.tweetData.content?.itemContent?.tweet_results?.result?.card
+      if (card != null) {
+        const cardName: string | null = card.legacy?.name
+        if (cardName?.match(/^poll/) != null) {
+          const pollIdMatch = (card.rest_id as string).match(/^card:\/\/(\d*)$/)
+          if (pollIdMatch != null) {
+            attachments.poll_ids = [pollIdMatch[1]]
+          }
+        }
+      }
+
+      if (Object.getOwnPropertyNames(attachments).length === 0) {
+        if (this.verbose) {
+          console.log('Tweet has no attachments.')
+        }
+        return
+      }
+
+      if (this.tweet != null) {
+        this.tweet.attachments = attachments
+      }
     })
 
     return this
@@ -203,6 +231,11 @@ export class TweetBuilder {
 
   async build (): Promise<Tweet> {
     await this.init()
+
+    if (this.id == null || this.tweetData == null || this.tweet == null) {
+      throw new Error('Tweet data not initialized.')
+    }
+
     await Promise.all(this.jobs.map(async (job) => { await job.call(this) }))
 
     if (this.tweet == null) {

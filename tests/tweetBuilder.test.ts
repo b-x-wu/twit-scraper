@@ -98,4 +98,24 @@ describe('TweetGetter', () => {
 
     expect(actualResponseTweet.referenced_tweets).toStrictEqual(expectedReferencedTweets)
   }, 10000)
+
+  test('gets correct attachments poll ids', async () => {
+    const actualTweet = await (new TweetBuilder('1623364562601885696'))
+      .getAttachments()
+      .build()
+
+    const expectedAttachments = { poll_ids: ['1623364561951678468'] }
+
+    expect(actualTweet.attachments).toStrictEqual(expectedAttachments)
+  })
+
+  test('gets correct attachments media keys', async () => {
+    const actualTweet = await (new TweetBuilder('1619500153337171968'))
+      .getAttachments()
+      .build()
+
+    const expectedAttachments = { media_keys: ['3_1619500025255714817', '3_1619500012597313536'] }
+
+    expect(actualTweet.attachments).toStrictEqual(expectedAttachments)
+  })
 })
