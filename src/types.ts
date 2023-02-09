@@ -33,6 +33,12 @@ export interface PublicMetrics {
   impression_count?: number
 }
 
+export enum ReplySettings {
+  EVERYONE = 'everyone',
+  MENTIONED_USERS = 'mentioned_users',
+  FOLLOWERS = 'followers'
+}
+
 export interface Tweet {
   id: string
   text: string
@@ -63,18 +69,15 @@ export interface Tweet {
   in_reply_to_user_id?: string
   lang?: string // BCP47 language tag
   public_metrics?: PublicMetrics
-  organic_metrics?: {
-    impression_count: number
-    like_count: number
-    reply_count: number
-    retweet_count: number
-  }
+  // TODO: find some way to do oauth for non public metrics
+  // TODO: find some way to do oauth for organic metrics
+  // TODO: find some way to do oauth for promoted metrics
   possibly_sensitive?: boolean
   referenced_tweets?: Array<{
     type: ReferencedTweetTypes
     id: string
   }>
-  reply_settings?: 'everyone' | 'mentionedUsers' | 'following'
+  reply_settings?: ReplySettings
 }
 
 export interface User {

@@ -1,8 +1,9 @@
-import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention, type PublicMetrics } from './types'
-import puppeteer from 'puppeteer'
+import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention, type PublicMetrics, ReplySettings } from './types'
+import puppeteer, { type Page } from 'puppeteer'
 
 export class TweetBuilder {
   tweetData: any
+  tweetPage: Page | undefined
   id: string
   tweet: Tweet | undefined
   verbose: boolean = false
@@ -13,10 +14,7 @@ export class TweetBuilder {
     this.verbose = verbose ?? false
   }
 
-  private async init (): Promise<void> {
-    const browser = await puppeteer.launch()
-    const page = await browser.newPage()
-
+  private async init (page: Page): Promise<void> {
     page.on('requestfinished', (request) => {
       void (async () => {
         const requestUrl = request.url()
@@ -43,14 +41,13 @@ export class TweetBuilder {
 
     await page.goto(`https://twitter.com/x/status/${this.id}`)
     await page.waitForNetworkIdle()
-    await browser.close()
 
     await this.getBaseTweet()
   }
 
   private async getBaseTweet (): Promise<void> {
     if (this.id == null || this.tweetData == null) {
-      throw new Error('Tweet data not initialized.')
+      throw new Error('Tweet data was not initialized. Cannot get base tweet.')
     }
 
     // TODO: figure out what to do with age restricted tweets
@@ -183,7 +180,7 @@ export class TweetBuilder {
 
       if (referencedTweets.length === 0) {
         if (this.verbose) {
-          console.log('This tweet has no referenced tweets.')
+          console.log('This tweet has no referenced tweets. No "referenced_tweets" field added.')
         }
         return
       }
@@ -223,7 +220,7 @@ export class TweetBuilder {
 
       if (Object.getOwnPropertyNames(attachments).length === 0) {
         if (this.verbose) {
-          console.log('Tweet has no attachments.')
+          console.log('This tweet has no attachments. No "attachments" field added.')
         }
         return
       }
@@ -264,7 +261,7 @@ export class TweetBuilder {
 
       if (Object.getOwnPropertyNames(entities).length === 0) {
         if (this.verbose) {
-          console.log('Tweet has no entities.')
+          console.log('This tweet has no entities. No "entities" field added.')
         }
         return
       }
@@ -311,19 +308,86 @@ export class TweetBuilder {
     return this
   }
 
+  getIsPossiblySensitive (): TweetBuilder {
+    this.jobs.push(async () => {
+      const isPossiblySensitive = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.possibly_sensitive
+
+      if (isPossiblySensitive == null) {
+        throw new Error('Error retrieving possibly_sensitive field.')
+      }
+
+      if (this.tweet != null) {
+        this.tweet.possibly_sensitive = isPossiblySensitive
+      }
+    })
+
+    return this
+  }
+
+  getLanguage (): TweetBuilder {
+    this.jobs.push(async () => {
+      const language = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.lang
+
+      if (language == null) {
+        throw new Error('Error retrieving lang field.')
+      }
+
+      if (this.tweet != null) {
+        this.tweet.lang = language
+      }
+    })
+
+    return this
+  }
+
+  getReplySettings (): TweetBuilder {
+    this.jobs.push(async () => {
+      if (this.tweet == null) {
+        return
+      }
+
+      const conversationControl = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.conversation_control
+      if (conversationControl == null) {
+        this.tweet.reply_settings = ReplySettings.EVERYONE
+        return
+      }
+
+      if (conversationControl.policy === 'Community') {
+        this.tweet.reply_settings = ReplySettings.FOLLOWERS
+        return
+      }
+
+      if (conversationControl.policy === 'ByInvitation') {
+        this.tweet.reply_settings = ReplySettings.MENTIONED_USERS
+        return
+      }
+
+      if (this.verbose) {
+        console.log('No reply setting added. Unrecognized conversation control policy encountered:', conversationControl.policy)
+      }
+    })
+
+    return this
+  }
+
   async build (): Promise<Tweet> {
-    await this.init()
+    const browser = await puppeteer.launch()
+    this.tweetPage = await browser.newPage()
+
+    await this.init(this.tweetPage)
 
     if (this.id == null || this.tweetData == null || this.tweet == null) {
-      throw new Error('Tweet data not initialized.')
+      throw new Error('Tweet data was not initialized. Cannot get tweet fields.')
     }
 
-    await Promise.all(this.jobs.map(async (job) => { await job.call(this) }))
+    await Promise.allSettled(this.jobs.map(async (job) => { await job.call(this) }))
 
     if (this.tweet == null) {
       throw new Error('Error building tweet')
     }
 
+    await browser.close()
+    this.tweetPage = undefined
     return this.tweet
   }
 }

@@ -4,7 +4,7 @@ console.log('start')
 void (async () => {
   try {
     // '1622000934535725057' age restricted tweet
-    const tweet = await new TweetBuilder('1623563614979325952', true)
+    const tweet = await new TweetBuilder('1529447517645025280', true)
       .getAuthorId()
       .getCreatedAt()
       .getEditControls()
@@ -14,6 +14,9 @@ void (async () => {
       .getAttachments()
       .getEntities()
       .getPublicMetrics()
+      .getIsPossiblySensitive()
+      .getLanguage()
+      .getReplySettings()
       .build()
     console.log(JSON.stringify(tweet, null, 2))
   } catch (e: any) {
