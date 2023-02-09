@@ -1,13 +1,14 @@
 import { TweetBuilder } from './tweetBuilder'
 
 console.log('start')
-const tweetBuilder = new TweetBuilder('1460323737035677698')
 void (async () => {
   try {
     // '1622000934535725057' age restricted tweet
-    const tweet = await tweetBuilder.getAuthorId()
+    const tweet = await new TweetBuilder('1623463792700014595')
+      .getAuthorId()
       .getCreatedAt()
       .getEditControls()
+      .getConversationId()
       .build()
     console.log(tweet)
   } catch (e: any) {

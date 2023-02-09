@@ -53,4 +53,22 @@ describe('TweetGetter', () => {
 
     expect(actualTweet.edit_controls).toStrictEqual(expectedEditControls)
   }, 10000)
+
+  test('gets correct conversation id', async () => {
+    const actualTweet = await tweetBuilder.getConversationId().build()
+
+    const expectedConversationId = '1460323737035677698'
+
+    expect(actualTweet.conversation_id).toBe(expectedConversationId)
+  }, 10000)
+
+  test('gets correct conversation id for response', async () => {
+    const actualResponseTweet = await (new TweetBuilder('1623463792700014595'))
+      .getConversationId()
+      .build()
+
+    const expectedConversationId = '1623446320198344708'
+
+    expect(actualResponseTweet.conversation_id).toBe(expectedConversationId)
+  }, 10000)
 })

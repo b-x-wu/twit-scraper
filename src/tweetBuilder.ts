@@ -28,7 +28,9 @@ export class TweetBuilder {
             this.tweetData = this.tweetData != null
               ? this.tweetData
               : instructions?.find((instruction) => instruction.type === 'TimelineAddEntries')?.entries?.find((entry: any) => {
-                return entry.entryId.match(/^tweet-\d+$/) != null
+                const entryId: string = entry?.entryId ?? ''
+                const match = entryId.match(/^\w.*?-(\d.*)$/)
+                return match != null && match[1] === this.id
               })
           } catch (e: any) {
             if (this.verbose) {
@@ -49,7 +51,7 @@ export class TweetBuilder {
 
   private async getBaseTweet (): Promise<void> {
     if (this.id == null || this.tweetData == null) {
-      throw new Error('Tweet data not initialized. Call this.init().')
+      throw new Error('Tweet data not initialized.')
     }
 
     // TODO: figure out what to do with age restricted tweets
@@ -76,16 +78,12 @@ export class TweetBuilder {
   }
 
   getCreatedAt (): TweetBuilder {
-    // FIXME: is this getting run before this.build?
     this.jobs.push(async () => {
       if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized. Call this.init().')
+        throw new Error('Tweet data not initialized.')
       }
 
       const createdAt: string = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.created_at
-      if (createdAt == null) {
-        throw new Error('Error retrieving created_at data from tweet object.')
-      }
 
       const createdAtDate = new Date(createdAt)
       this.tweet.created_at = createdAtDate.toISOString()
@@ -97,13 +95,10 @@ export class TweetBuilder {
   getAuthorId (): TweetBuilder {
     this.jobs.push(async () => {
       if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized. Call this.init().')
+        throw new Error('Tweet data not initialized.')
       }
 
       const authorId: string = this.tweetData.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.rest_id
-      if (authorId == null) {
-        throw new Error('Error retrieving author_id data from tweet object.')
-      }
 
       this.tweet.author_id = authorId
     })
@@ -114,7 +109,7 @@ export class TweetBuilder {
   getEditControls (): TweetBuilder {
     this.jobs.push(async () => {
       if (this.id == null || this.tweetData == null || this.tweet == null) {
-        throw new Error('Tweet data not initialized. Call this.init().')
+        throw new Error('Tweet data not initialized.')
       }
 
       const editControls: any = this.tweetData.content?.itemContent?.tweet_results?.result?.edit_control
@@ -127,6 +122,34 @@ export class TweetBuilder {
         is_edit_eligible: isEditEligible,
         edits_remaining: parseInt(editsRemaining)
       }
+    })
+
+    return this
+  }
+
+  getConversationId (): TweetBuilder {
+    this.jobs.push(async () => {
+      if (this.id == null || this.tweetData == null || this.tweet == null) {
+        throw new Error('Tweet data not initialized.')
+      }
+
+      const conversationId = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.conversation_id_str
+
+      this.tweet.conversation_id = conversationId
+    })
+
+    return this
+  }
+
+  getInReplyToUserId (): TweetBuilder {
+    this.jobs.push(async () => {
+      if (this.id == null || this.tweetData == null || this.tweet == null) {
+        throw new Error('Tweet data not initialized.')
+      }
+
+      const inReplyToUserId = this.tweetData.content?.itemContent?.tweet_results?.reslut?.legacy?.in_reply_to_user_id_str
+
+      this.tweet.in_reply_to_user_id = inReplyToUserId
     })
 
     return this
