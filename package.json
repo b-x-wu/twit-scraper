@@ -2,7 +2,7 @@
   "name": "twit-scraper",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/app.js",
   "scripts": {
     "dev": "npx tsc-watch --noClear --onSuccess \"node ./out/src/app.js\"",
     "build": "npx tsc -p tsconfig.build.json",

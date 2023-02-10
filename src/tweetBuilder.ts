@@ -1,4 +1,4 @@
-import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention, type PublicMetrics, ReplySettings, ErrorReason } from './types'
+import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention, type PublicMetrics, ReplySettings, ErrorReason, TweetField } from './types'
 import puppeteer, { type Page } from 'puppeteer'
 import { TweetError } from './tweetError'
 
@@ -442,5 +442,30 @@ export class TweetBuilder {
     await browser.close()
     this.tweetPage = undefined
     return this.tweet
+  }
+
+  async buildTweetFromFields (tweetFields: TweetField[]): Promise<Tweet> {
+    const tweetFieldToMethodMap: Map<TweetField, () => TweetBuilder> =
+      new Map<TweetField, () => TweetBuilder>([
+        [TweetField.ATTACHMENTS, this.getAttachments],
+        [TweetField.AUTHOR_ID, this.getAuthorId],
+        [TweetField.CONVERSATION_ID, this.getConversationId],
+        [TweetField.CREATED_AT, this.getCreatedAt],
+        [TweetField.EDIT_CONTROLS, this.getEditControls],
+        [TweetField.ENTITIES, this.getEntities],
+        [TweetField.IN_REPLY_TO_USER_ID, this.getInReplyToUserId],
+        [TweetField.LANG, this.getLanguage],
+        [TweetField.PUBLIC_METRICS, this.getPublicMetrics],
+        [TweetField.POSSIBLY_SENSITIVE, this.getIsPossiblySensitive],
+        [TweetField.REFERENCED_TWEETS, this.getReferencedTweets],
+        [TweetField.REPLY_SETTINGS, this.getReplySettings],
+        [TweetField.SOURCE, this.getSource]
+      ])
+
+    tweetFields.map((tweetField) => tweetFieldToMethodMap.get(tweetField))
+      .filter((buildingMethod) => buildingMethod != null)
+      .forEach((buildingMethod) => buildingMethod?.call(this))
+
+    return await this.build()
   }
 }

@@ -1,6 +1,7 @@
 import express from 'express'
 import { TweetBuilder } from './tweetBuilder'
 import { type TweetError } from './tweetError'
+import { TweetField } from './types'
 
 const app = express()
 
@@ -15,7 +16,7 @@ app.get('/tweets/:id', (req, res) => {
       const tweet = await new TweetBuilder(id, true).build()
       res.json({
         data: tweet,
-        includes: {} // TODO: work on includes
+        includes: {} // TODO: add support for includes objects
       })
     } catch (e: any) {
       const tweetError: TweetError = e
@@ -26,27 +27,18 @@ app.get('/tweets/:id', (req, res) => {
 
 app.listen(3000)
 
-// console.log('start')
-// void (async () => {
-//   try {
-//     // '1622000934535725057' age restricted tweet
-//     const tweet = await new TweetBuilder('1529447517645025280', true)
-//       .getAuthorId()
-//       .getCreatedAt()
-//       .getEditControls()
-//       .getInReplyToUserId()
-//       .getConversationId()
-//       .getReferencedTweets()
-//       .getAttachments()
-//       .getEntities()
-//       .getPublicMetrics()
-//       .getIsPossiblySensitive()
-//       .getLanguage()
-//       .getReplySettings()
-//       .getSource()
-//       .build()
-//     console.log(JSON.stringify(tweet, null, 2))
-//   } catch (e: any) {
-//     console.log(e.toString())
-//   }
-// })()
+console.log('start')
+void (async () => {
+  try {
+    // '1622000934535725057' age restricted tweet
+    const tweet = await new TweetBuilder('1623387211910488075', true)
+      .buildTweetFromFields([
+        TweetField.REPLY_SETTINGS,
+        TweetField.PUBLIC_METRICS,
+        TweetField.SOURCE
+      ])
+    console.log(JSON.stringify(tweet, null, 2))
+  } catch (e: any) {
+    console.log(e.toString())
+  }
+})()

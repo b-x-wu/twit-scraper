@@ -1,6 +1,6 @@
 import { TweetBuilder } from '../src/tweetBuilder'
 import { describe, expect, test } from '@jest/globals'
-import { ReplySettings } from '../src/types'
+import { ReplySettings, TweetField } from '../src/types'
 
 describe('TweetGetter', () => {
   test('gets correct base tweet', async () => {
@@ -210,5 +210,25 @@ describe('TweetGetter', () => {
     const expectedSource = 'Twitter for iPhone'
 
     expect(actualTweet.source).toBe(expectedSource)
+  }, 10000)
+
+  test('gets correct tweet from fields', async () => {
+    const actualTweet = await new TweetBuilder('1623387211910488075')
+      .buildTweetFromFields([
+        TweetField.REPLY_SETTINGS,
+        TweetField.SOURCE
+      ])
+
+    const expectedTweet = {
+      id: '1623387211910488075',
+      text: 'It finally happened: someone asked me where the library was in Spanish. I’ve been training for this since high school.',
+      edit_history_tweet_ids: [
+        '1623387211910488075'
+      ],
+      reply_settings: 'everyone',
+      source: 'Twitter for iPhone'
+    }
+
+    expect(actualTweet).toStrictEqual(expectedTweet)
   }, 10000)
 })

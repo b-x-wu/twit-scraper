@@ -130,3 +130,25 @@ export enum ErrorReason {
   CANNOT_FIND_TWEET = 'cannot-find-tweet',
   SERVER_ERROR = 'server-error'
 }
+export const reasonToStatusMap: Map<ErrorReason, number> = new Map<ErrorReason, number>([
+  [ErrorReason.AGE_RESTRICTED, 403],
+  [ErrorReason.CANNOT_FIND_TWEET, 404],
+  [ErrorReason.SERVER_ERROR, 500]
+])
+
+export enum TweetField {
+  ATTACHMENTS = 'attachments',
+  AUTHOR_ID = 'author_id',
+  CONVERSATION_ID = 'conversatio_id',
+  CREATED_AT = 'created_at',
+  EDIT_CONTROLS = 'edit_controls',
+  ENTITIES = 'entities',
+  IN_REPLY_TO_USER_ID = 'in_reply_to_user_id',
+  LANG = 'lang',
+  PUBLIC_METRICS = 'public_metrics',
+  POSSIBLY_SENSITIVE = 'possibly_sensitive',
+  REFERENCED_TWEETS = 'referenced_tweets',
+  REPLY_SETTINGS = 'reply_settings',
+  SOURCE = 'source'
+  // skipping id and text because they're included by default
+}
