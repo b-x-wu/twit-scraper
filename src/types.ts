@@ -78,6 +78,7 @@ export interface Tweet {
     id: string
   }>
   reply_settings?: ReplySettings
+  source?: string
 }
 
 export interface User {

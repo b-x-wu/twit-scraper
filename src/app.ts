@@ -17,6 +17,7 @@ void (async () => {
       .getIsPossiblySensitive()
       .getLanguage()
       .getReplySettings()
+      .getSource()
       .build()
     console.log(JSON.stringify(tweet, null, 2))
   } catch (e: any) {

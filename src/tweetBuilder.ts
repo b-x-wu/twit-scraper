@@ -370,6 +370,26 @@ export class TweetBuilder {
     return this
   }
 
+  getSource (): TweetBuilder {
+    this.jobs.push(async () => {
+      const sourceElementString: string = this.tweetData.content?.itemContent?.tweet_results?.result?.source
+      if (sourceElementString == null) {
+        throw new Error('Could not find the source field.')
+      }
+
+      const sourceMatch = sourceElementString.match(/^<a.*?>(.*)<\/a>$/)
+      if (sourceMatch == null) {
+        throw new Error('Unrecognized source string format: ' + sourceElementString)
+      }
+
+      if (this.tweet != null) {
+        this.tweet.source = sourceMatch[1]
+      }
+    })
+
+    return this
+  }
+
   async build (): Promise<Tweet> {
     const browser = await puppeteer.launch()
     this.tweetPage = await browser.newPage()
@@ -381,10 +401,6 @@ export class TweetBuilder {
     }
 
     await Promise.allSettled(this.jobs.map(async (job) => { await job.call(this) }))
-
-    if (this.tweet == null) {
-      throw new Error('Error building tweet')
-    }
 
     await browser.close()
     this.tweetPage = undefined

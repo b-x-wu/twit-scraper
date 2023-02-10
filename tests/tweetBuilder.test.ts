@@ -201,4 +201,14 @@ describe('TweetGetter', () => {
 
     expect(actualTweet.reply_settings).toBe(expectedReplySettings)
   }, 10000)
+
+  test('gets correct source', async () => {
+    const actualTweet = await (new TweetBuilder('1529447517645025280'))
+      .getSource()
+      .build()
+
+    const expectedSource = 'Twitter for iPhone'
+
+    expect(actualTweet.source).toBe(expectedSource)
+  }, 10000)
 })
