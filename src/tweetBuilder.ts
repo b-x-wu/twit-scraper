@@ -57,10 +57,36 @@ export class TweetBuilder {
 
     // TODO: figure out what to do with age restricted tweets
     if (this.tweetData.content?.itemContent?.tweet_results?.result?.__typename === 'TweetTombstone') {
+      const tombstoneText: string | undefined = this.tweetData.content?.itemContent?.tweet_results?.result?.tombstone?.text?.text
+
+      if (tombstoneText == null) {
+        throw new TweetError(
+          ErrorReason.TWEET_UNAVAILABLE,
+          'Tweet is made unavailable due to unknown reasons. Could not find tombstone text.',
+          { id: this.id }
+        )
+      }
+
+      if (tombstoneText.includes('this account owner limits who can view their Tweets')) {
+        throw new TweetError(
+          ErrorReason.PRIVATE_ACCOUNT,
+          'This tweet is from a private account. Unauthorized to serve this tweet.',
+          { id: this.id, tombstoneText }
+        )
+      }
+
+      if (tombstoneText.includes('This content might not be appropriate for people under 18 years old.')) {
+        throw new TweetError(
+          ErrorReason.AGE_RESTRICTED,
+          'Tweet is age restricted. Unauthorized to serve this tweet.',
+          { id: this.id, tombstoneText }
+        )
+      }
+
       throw new TweetError(
-        ErrorReason.AGE_RESTRICTED,
-        'Encountered tombstone instead of tweet. Tweet may be age restricted',
-        { id: this.id }
+        ErrorReason.TWEET_UNAVAILABLE,
+        'Tweet is made unavailable due to unknown reasons. Tombstone encountered.',
+        { id: this.id, tombstoneText }
       )
     }
 
