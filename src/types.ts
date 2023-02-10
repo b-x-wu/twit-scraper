@@ -1,3 +1,5 @@
+import { type TweetError } from './tweetError'
+
 export interface Hashtag {
   start: number
   end: number
@@ -128,10 +130,12 @@ export interface Media {
 export enum ErrorReason {
   RESOURCE_NOT_FOUND = 'resource-not-found',
   SERVER_ERROR = 'server-error',
-  RESOURCE_UNAUTHORIZED = 'not-authorized-for-resource'
+  RESOURCE_UNAUTHORIZED = 'not-authorized-for-resource',
+  INVALID_REQUEST = 'invalid-request'
 }
 export const reasonToStatusMap: Map<ErrorReason, number> = new Map<ErrorReason, number>([
   [ErrorReason.RESOURCE_NOT_FOUND, 404],
+  [ErrorReason.INVALID_REQUEST, 404],
   [ErrorReason.SERVER_ERROR, 500],
   [ErrorReason.RESOURCE_UNAUTHORIZED, 403]
 ])
@@ -151,4 +155,10 @@ export enum TweetField {
   REPLY_SETTINGS = 'reply_settings',
   SOURCE = 'source'
   // skipping id and text because they're included by default
+}
+
+export interface ApiSuccessResult {
+  data: any
+  includes?: any
+  errors?: TweetError[]
 }

@@ -27,6 +27,14 @@ describe('TweetError', () => {
     expect(tweetError.status).toBe(expectedStatus)
   })
 
+  test('has correct status for reason ' + ErrorReason.INVALID_REQUEST, async () => {
+    const tweetError = new TweetError(ErrorReason.INVALID_REQUEST, 'Invalid request.')
+
+    const expectedStatus = 404
+
+    expect(tweetError.status).toBe(expectedStatus)
+  })
+
   test('has correct status for reason undefined error reason', async () => {
     const tweetError = new TweetError('invalid error reason' as ErrorReason, 'Invalid.')
 
