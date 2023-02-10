@@ -128,18 +128,20 @@ export interface Media {
 export enum ErrorReason {
   AGE_RESTRICTED = 'age-restricted-tweet',
   CANNOT_FIND_TWEET = 'cannot-find-tweet',
-  SERVER_ERROR = 'server-error'
+  SERVER_ERROR = 'server-error',
+  INVALID_REQUEST = 'invalid-request'
 }
 export const reasonToStatusMap: Map<ErrorReason, number> = new Map<ErrorReason, number>([
   [ErrorReason.AGE_RESTRICTED, 403],
   [ErrorReason.CANNOT_FIND_TWEET, 404],
-  [ErrorReason.SERVER_ERROR, 500]
+  [ErrorReason.SERVER_ERROR, 500],
+  [ErrorReason.INVALID_REQUEST, 404]
 ])
 
 export enum TweetField {
   ATTACHMENTS = 'attachments',
   AUTHOR_ID = 'author_id',
-  CONVERSATION_ID = 'conversatio_id',
+  CONVERSATION_ID = 'conversation_id',
   CREATED_AT = 'created_at',
   EDIT_CONTROLS = 'edit_controls',
   ENTITIES = 'entities',

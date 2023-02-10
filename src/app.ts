@@ -1,9 +1,12 @@
 import express from 'express'
 import { TweetBuilder } from './tweetBuilder'
 import { type TweetError } from './tweetError'
-import { TweetField } from './types'
+import dotenv from 'dotenv'
+import { queryToCommaSeparatedString } from './utils'
+import { type TweetField } from './types'
 
 const app = express()
+dotenv.config()
 
 app.get('/', (req, res) => {
   res.send('Hello, world!')
@@ -12,8 +15,10 @@ app.get('/', (req, res) => {
 app.get('/tweets/:id', (req, res) => {
   void (async () => {
     const id = req.params.id
+    const tweetFields =
+      queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
     try {
-      const tweet = await new TweetBuilder(id, true).build()
+      const tweet = await new TweetBuilder(id, true).buildTweetFromFields(tweetFields as TweetField[] | undefined)
       res.json({
         data: tweet,
         includes: {} // TODO: add support for includes objects
@@ -25,20 +30,4 @@ app.get('/tweets/:id', (req, res) => {
   })()
 })
 
-app.listen(3000)
-
-console.log('start')
-void (async () => {
-  try {
-    // '1622000934535725057' age restricted tweet
-    const tweet = await new TweetBuilder('1623387211910488075', true)
-      .buildTweetFromFields([
-        TweetField.REPLY_SETTINGS,
-        TweetField.PUBLIC_METRICS,
-        TweetField.SOURCE
-      ])
-    console.log(JSON.stringify(tweet, null, 2))
-  } catch (e: any) {
-    console.log(e.toString())
-  }
-})()
+app.listen(process.env.PORT ?? 3000)

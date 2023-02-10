@@ -64,6 +64,8 @@ export class TweetBuilder {
       )
     }
 
+    // TODO: catch the case of the private account
+
     const id = this.tweetData.content?.itemContent?.tweet_results?.result?.rest_id
     const text = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.full_text
     const editHistoryTweetIds = this.tweetData.content?.itemContent?.tweet_results?.result?.edit_control?.edit_tweet_ids
@@ -444,7 +446,12 @@ export class TweetBuilder {
     return this.tweet
   }
 
-  async buildTweetFromFields (tweetFields: TweetField[]): Promise<Tweet> {
+  async buildTweetFromFields (tweetFields: TweetField[] | undefined): Promise<Tweet> {
+    // check if there are no fields to add
+    if (tweetFields == null || tweetFields.length === 0) {
+      return await this.build()
+    }
+
     const tweetFieldToMethodMap: Map<TweetField, () => TweetBuilder> =
       new Map<TweetField, () => TweetBuilder>([
         [TweetField.ATTACHMENTS, this.getAttachments],
