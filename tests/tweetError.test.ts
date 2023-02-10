@@ -3,15 +3,15 @@ import { ErrorReason } from '../src/types'
 import { TweetError } from '../src/tweetError'
 
 describe('TweetError', () => {
-  test('has correct status for reason age-restricted-tweet', async () => {
-    const tweetError = new TweetError(ErrorReason.AGE_RESTRICTED, 'This is an age restricted tweet.')
+  test('has correct status for reason ' + ErrorReason.RESOURCE_UNAUTHORIZED, async () => {
+    const tweetError = new TweetError(ErrorReason.RESOURCE_UNAUTHORIZED, 'This resource is not authorized.')
 
     const expectedStatus = 403
 
     expect(tweetError.status).toBe(expectedStatus)
   })
 
-  test('has correct status for reason server-error', async () => {
+  test('has correct status for reason ' + ErrorReason.SERVER_ERROR, async () => {
     const tweetError = new TweetError(ErrorReason.SERVER_ERROR, 'Server error encountered.')
 
     const expectedStatus = 500
@@ -19,26 +19,10 @@ describe('TweetError', () => {
     expect(tweetError.status).toBe(expectedStatus)
   })
 
-  test('has correct status for reason cannot-find-tweet', async () => {
-    const tweetError = new TweetError(ErrorReason.CANNOT_FIND_TWEET, 'Unable to find tweet with this id.')
+  test('has correct status for reason ' + ErrorReason.RESOURCE_NOT_FOUND, async () => {
+    const tweetError = new TweetError(ErrorReason.RESOURCE_NOT_FOUND, 'Resource not found.')
 
     const expectedStatus = 404
-
-    expect(tweetError.status).toBe(expectedStatus)
-  })
-
-  test('has correct status for reason tweet-from-private-account', async () => {
-    const tweetError = new TweetError(ErrorReason.PRIVATE_ACCOUNT, 'Tweet from private account.')
-
-    const expectedStatus = 403
-
-    expect(tweetError.status).toBe(expectedStatus)
-  })
-
-  test('has correct status for reason tweet-unavailable', async () => {
-    const tweetError = new TweetError(ErrorReason.TWEET_UNAVAILABLE, 'Tweet is unavailable.')
-
-    const expectedStatus = 403
 
     expect(tweetError.status).toBe(expectedStatus)
   })

@@ -49,7 +49,7 @@ export class TweetBuilder {
   private async getBaseTweet (): Promise<void> {
     if (this.id == null || this.tweetData == null) {
       throw new TweetError(
-        ErrorReason.CANNOT_FIND_TWEET,
+        ErrorReason.RESOURCE_NOT_FOUND,
         'Tweet data was not initialized. Cannot get base tweet. Tweet may not exist.',
         { id: this.id }
       )
@@ -61,7 +61,7 @@ export class TweetBuilder {
 
       if (tombstoneText == null) {
         throw new TweetError(
-          ErrorReason.TWEET_UNAVAILABLE,
+          ErrorReason.RESOURCE_NOT_FOUND,
           'Tweet is made unavailable due to unknown reasons. Could not find tombstone text.',
           { id: this.id }
         )
@@ -69,7 +69,7 @@ export class TweetBuilder {
 
       if (tombstoneText.includes('this account owner limits who can view their Tweets')) {
         throw new TweetError(
-          ErrorReason.PRIVATE_ACCOUNT,
+          ErrorReason.RESOURCE_UNAUTHORIZED,
           'This tweet is from a private account. Unauthorized to serve this tweet.',
           { id: this.id, tombstoneText }
         )
@@ -77,14 +77,14 @@ export class TweetBuilder {
 
       if (tombstoneText.includes('This content might not be appropriate for people under 18 years old.')) {
         throw new TweetError(
-          ErrorReason.AGE_RESTRICTED,
+          ErrorReason.RESOURCE_UNAUTHORIZED,
           'Tweet is age restricted. Unauthorized to serve this tweet.',
           { id: this.id, tombstoneText }
         )
       }
 
       throw new TweetError(
-        ErrorReason.TWEET_UNAVAILABLE,
+        ErrorReason.RESOURCE_NOT_FOUND,
         'Tweet is made unavailable due to unknown reasons. Tombstone encountered.',
         { id: this.id, tombstoneText }
       )

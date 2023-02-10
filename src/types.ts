@@ -126,20 +126,14 @@ export interface Media {
 }
 
 export enum ErrorReason {
-  PRIVATE_ACCOUNT = 'tweet-from-private-account',
-  AGE_RESTRICTED = 'age-restricted-tweet',
-  TWEET_UNAVAILABLE = 'tweet-unavailable',
-  CANNOT_FIND_TWEET = 'cannot-find-tweet',
+  RESOURCE_NOT_FOUND = 'resource-not-found',
   SERVER_ERROR = 'server-error',
-  INVALID_REQUEST = 'invalid-request'
+  RESOURCE_UNAUTHORIZED = 'not-authorized-for-resource'
 }
 export const reasonToStatusMap: Map<ErrorReason, number> = new Map<ErrorReason, number>([
-  [ErrorReason.AGE_RESTRICTED, 403],
-  [ErrorReason.CANNOT_FIND_TWEET, 404],
+  [ErrorReason.RESOURCE_NOT_FOUND, 404],
   [ErrorReason.SERVER_ERROR, 500],
-  [ErrorReason.INVALID_REQUEST, 404],
-  [ErrorReason.PRIVATE_ACCOUNT, 403],
-  [ErrorReason.TWEET_UNAVAILABLE, 403]
+  [ErrorReason.RESOURCE_UNAUTHORIZED, 403]
 ])
 
 export enum TweetField {
