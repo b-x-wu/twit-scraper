@@ -124,3 +124,9 @@ export interface Media {
   }
   alt_text?: string
 }
+
+export enum ErrorReason {
+  AGE_RESTRICTED = 'age-restricted-tweet',
+  CANNOT_FIND_TWEET = 'cannot-find-tweet',
+  SERVER_ERROR = 'server-error'
+}

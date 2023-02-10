@@ -1,5 +1,6 @@
-import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention, type PublicMetrics, ReplySettings } from './types'
+import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention, type PublicMetrics, ReplySettings, ErrorReason } from './types'
 import puppeteer, { type Page } from 'puppeteer'
+import { TweetError } from './tweetError'
 
 export class TweetBuilder {
   tweetData: any
@@ -47,12 +48,20 @@ export class TweetBuilder {
 
   private async getBaseTweet (): Promise<void> {
     if (this.id == null || this.tweetData == null) {
-      throw new Error('Tweet data was not initialized. Cannot get base tweet.')
+      throw new TweetError(
+        ErrorReason.CANNOT_FIND_TWEET,
+        'Tweet data was not initialized. Cannot get base tweet. Tweet may not exist.',
+        { id: this.id }
+      )
     }
 
     // TODO: figure out what to do with age restricted tweets
     if (this.tweetData.content?.itemContent?.tweet_results?.result?.__typename === 'TweetTombstone') {
-      throw new Error('Encountered tombstone instead of tweet. Tweet may be age restricted')
+      throw new TweetError(
+        ErrorReason.AGE_RESTRICTED,
+        'Encountered tombstone instead of tweet. Tweet may be age restricted',
+        { id: this.id }
+      )
     }
 
     const id = this.tweetData.content?.itemContent?.tweet_results?.result?.rest_id
@@ -60,7 +69,11 @@ export class TweetBuilder {
     const editHistoryTweetIds = this.tweetData.content?.itemContent?.tweet_results?.result?.edit_control?.edit_tweet_ids
 
     if (id == null || text == null || editHistoryTweetIds == null) {
-      throw new Error('Error retrieving data from tweet object.')
+      throw new TweetError(
+        ErrorReason.SERVER_ERROR,
+        'Error retrieving data from tweet object.',
+        { id, text, editHistoryTweetIds }
+      )
     }
 
     if (this.tweet == null) {
@@ -282,7 +295,11 @@ export class TweetBuilder {
       const quoteCount: number = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.quote_count
 
       if (likeCount == null || retweetCount == null || replyCount == null || quoteCount == null) {
-        throw new Error('Error retrieving public metrics.')
+        throw new TweetError(
+          ErrorReason.SERVER_ERROR,
+          'Error retrieving public metrics.',
+          { id: this.id, likeCount, retweetCount, replyCount, quoteCount }
+        )
       }
       const publicMetrics: PublicMetrics = {
         like_count: likeCount,
@@ -313,7 +330,11 @@ export class TweetBuilder {
       const isPossiblySensitive = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.possibly_sensitive
 
       if (isPossiblySensitive == null) {
-        throw new Error('Error retrieving possibly_sensitive field.')
+        throw new TweetError(
+          ErrorReason.SERVER_ERROR,
+          'Error retrieving possibly_sensitive field.',
+          { id: this.id, isPossiblySensitive }
+        )
       }
 
       if (this.tweet != null) {
@@ -329,7 +350,11 @@ export class TweetBuilder {
       const language = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.lang
 
       if (language == null) {
-        throw new Error('Error retrieving lang field.')
+        throw new TweetError(
+          ErrorReason.SERVER_ERROR,
+          'Error retrieving lang field.',
+          { id: this.id, language }
+        )
       }
 
       if (this.tweet != null) {
@@ -374,12 +399,20 @@ export class TweetBuilder {
     this.jobs.push(async () => {
       const sourceElementString: string = this.tweetData.content?.itemContent?.tweet_results?.result?.source
       if (sourceElementString == null) {
-        throw new Error('Could not find the source field.')
+        throw new TweetError(
+          ErrorReason.SERVER_ERROR,
+          'Could not find the source field.',
+          { id: this.id, sourceElementString }
+        )
       }
 
       const sourceMatch = sourceElementString.match(/^<a.*?>(.*)<\/a>$/)
       if (sourceMatch == null) {
-        throw new Error('Unrecognized source string format: ' + sourceElementString)
+        throw new TweetError(
+          ErrorReason.SERVER_ERROR,
+          'Unrecognized source string format.',
+          { id: this.id, sourceElementString }
+        )
       }
 
       if (this.tweet != null) {
@@ -397,7 +430,11 @@ export class TweetBuilder {
     await this.init(this.tweetPage)
 
     if (this.id == null || this.tweetData == null || this.tweet == null) {
-      throw new Error('Tweet data was not initialized. Cannot get tweet fields.')
+      throw new TweetError(
+        ErrorReason.SERVER_ERROR,
+        'Tweet data was not initialized. Cannot get tweet fields.',
+        { id: this.id, tweetData: this.tweetData, tweet: this.tweet }
+      )
     }
 
     await Promise.allSettled(this.jobs.map(async (job) => { await job.call(this) }))
