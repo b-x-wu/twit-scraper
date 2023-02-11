@@ -5,7 +5,7 @@ import dotenv from 'dotenv'
 import { queryToCommaSeparatedString } from './utils'
 import { type ApiSuccessResult, ErrorReason, type Tweet, type TweetField } from './types'
 
-const app = express()
+export const app = express()
 dotenv.config()
 
 app.get('/tweets/:id', (req, res) => {
@@ -15,7 +15,7 @@ app.get('/tweets/:id', (req, res) => {
       queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
 
     try {
-      const tweet = await new TweetBuilder(id, true).buildTweetFromFields(tweetFields as TweetField[] | undefined)
+      const tweet = await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
       const response: ApiSuccessResult = { data: tweet } // TODO: add support for includes objects
       res.json(response)
     } catch (e: any) {
@@ -41,7 +41,7 @@ app.get('/tweets', (req, res) => {
       queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
 
     const settledTweets = await Promise.allSettled(ids.map(async (id) => {
-      return await new TweetBuilder(id, true).buildTweetFromFields(tweetFields as TweetField[] | undefined)
+      return await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
     }))
 
     const [fulfilledTweets, rejectedTweets] = settledTweets.reduce<[Array<PromiseFulfilledResult<Tweet>>, PromiseRejectedResult[]]>(
@@ -64,4 +64,6 @@ app.get('*', (req, res) => {
   res.status(error.status).json(error)
 })
 
-app.listen(process.env.PORT ?? 3000)
+if (require.main === module) {
+  app.listen(process.env.PORT ?? 3000)
+}
