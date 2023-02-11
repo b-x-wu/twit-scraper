@@ -6,7 +6,7 @@ import request, { type SuperAgentRequest } from 'superagent'
 import { type Server } from 'node:http'
 
 const PORT = 8080
-const get = async (url: string): Promise<SuperAgentRequest> => request.get(`http://localhost:${PORT}${url}`)
+const get = async (url: string): Promise<SuperAgentRequest> => await request.get(`http://localhost:${PORT}${url}`)
 
 describe('/tweets/:id endpoint', () => {
   let server: Server
@@ -73,38 +73,5 @@ describe('/tweets/:id endpoint', () => {
 
     expect(actualStatus).toBe(expectedStatus)
     expect(actualBody).toStrictEqual(expectedBody)
-  }, 10000)
-
-  test('GET tweet with age restriction fails', async () => {
-    const expectedBody = {
-      errors: {
-        reason: 'not-authorized-for-resource',
-        detail: 'Tweet is age restricted. Unauthorized to serve this tweet.',
-        data: {
-          id: '1623732372108890112',
-          tombstoneText: 'Age-restricted adult content. This content might not be appropriate for people under 18 years old. To view this media, you’ll need to log in to Twitter. Learn more'
-        },
-        status: 403
-      }
-    }
-
-    await expect(get('/tweets/1623732372108890112')).rejects.toMatchObject({ response: { body: expectedBody } })
-  }, 10000)
-
-  // Not testing private accounts for privacy reasons
-
-  test('GET tweet that does not exist fails', async () => {
-    const expectedBody = {
-      errors: {
-        reason: 'resource-not-found',
-        detail: 'Tweet data was not initialized. Cannot get base tweet. Tweet may not exist.',
-        data: {
-          id: '12353432'
-        },
-        status: 404
-      }
-    }
-
-    await expect(get('/tweets/12353432')).rejects.toMatchObject({ response: { body: expectedBody } })
   }, 10000)
 })

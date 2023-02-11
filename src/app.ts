@@ -4,9 +4,12 @@ import { TweetError } from './tweetError'
 import dotenv from 'dotenv'
 import { queryToCommaSeparatedString } from './utils'
 import { type ApiSuccessResult, ErrorReason, type Tweet, type TweetField } from './types'
+import cors from 'cors'
 
 export const app = express()
 dotenv.config()
+
+app.use(cors())
 
 app.get('/tweets/:id', (req, res) => {
   void (async () => {
@@ -63,7 +66,3 @@ app.get('*', (req, res) => {
   const error = new TweetError(ErrorReason.INVALID_REQUEST, 'Invalid enpoint accessed')
   res.status(error.status).json(error)
 })
-
-if (require.main === module) {
-  app.listen(process.env.PORT ?? 3000)
-}
