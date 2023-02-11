@@ -13,7 +13,7 @@ I'm going to try to hit the readonly tweets and users endpoints and only concern
 <details>
 <summary>Typescript Interface</summary>
 <br>
-<pre><code class="language-js">export interface Tweet {
+<pre><code class="language-javascript">export interface Tweet {
   id: string
   text: string
   edit_history_tweet_ids: string[]
