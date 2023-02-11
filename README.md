@@ -10,109 +10,62 @@ I'm going to try to hit the readonly tweets and users endpoints and only concern
 
 ### Object Models
 
-```typescript
-interface Entity {
-    start: number
-    end: number
-    tag: string
-}
-
-interface Tweet {
+<details>
+<summary>Typescript Interface</summary>
+<br>
+<pre><code class="language-typescript">export interface Tweet {
+  id: string
+  text: string
+  edit_history_tweet_ids: string[]
+  attachments?: {
+    poll_ids?: string[]
+    media_keys?: string[]
+  }
+  author_id?: string
+  conversation_id?: string
+  created_at?: string // date string in the iso-8601 format
+  edit_controls?: {
+    edits_remaining: number
+    is_edit_eligible: boolean
+    editable_until: string // date string in the iso-8601 format
+  }
+  entities?: {
+    hashtags?: Array&lt;{
+      start: number
+      end: number
+      tag: string
+    }&gt;
+    mentions?: Array&lt;{
+      start: number
+      end: number
+      username: string
+    }&gt;
+    urls?: Array&lt;{
+      start: number
+      end: number
+      url: string
+      expanded_url: string
+      display_url: string
+    }&gt;
+  }
+  in_reply_to_user_id?: string
+  lang?: string // BCP47 language tag
+  public_metrics?: {
+    retweet_count: number
+    reply_count: number
+    like_count: number
+    quote_count: number
+    impression_count?: number
+  }
+  possibly_sensitive?: boolean
+  referenced_tweets?: Array&lt;{
+    type: 'retweeted' | 'replied_to' | 'quoted'
     id: string
-    text: string
-    edit_history_tweet_ids: string[]
-    attachments?: {
-        poll_ids?: string[]
-        media_keys?: string[]
-    }
-    author_id?: string
-    // skipping context_annotations
-    conversation_id?: string
-    created_at: string // in the iso-8601 format
-    edit_controls?: {
-        edits_remaining: number
-        is_edit_eligible: boolean
-        editable_until: string // in the iso-8601 format
-    }
-    entities?: {
-        cashtags?: Entity[]
-        hashtags?: Entity[]
-        mentions?: Entity[]
-        urls?: {
-            start: number
-            end: number
-            url: string
-            // skipping the rest of them
-        }[]
-    }
-    in_reply_to_user_id?: string
-    lang: string // BCP47 language tag
-    organic_metrics?: {
-        impression_count: number // replace with view count?
-        like_count: number
-        reply_count: number
-        retweet_count: number
-        // skipping url_link_clicks
-        // skipping user_profile_clicks
-    }
-    possibly_sensitive?: true
-    referenced_tweets?: {
-        type: "replied_to" | "quoted"
-        id: string
-    }[]
-    // skipping the rest
-}
-
-interface User {
-    id: string
-    name: string
-    username: string // ie the handle
-    created_at?: string // in the iso-8601 format
-    description?: string
-    entities?: { // same as entities in the Tweets object, but with the user's profile description
-        cashtags?: Entity[]
-        hashtags?: Entity[]
-        mentions?: Entity[]
-        urls?: {
-            start: number
-            end: number
-            url: string
-            // skipping the rest of them
-        }[]
-    }
-    // skipping location
-    pinned_tweet_id?: string
-    profile_image_url?: string
-    protected?: boolean
-    public_metrics?: {
-        followers_count: number
-        following_count: number
-        tweet_count: number
-        listed_count: number
-    }
-    url?: string // url in the user profile
-    verified: boolean
-    // skipping withheld
-}
-
-interface Media {
-    media_key: string
-    type: "string" | "gif" | "video"
-    url?: string
-    duration?: string
-    height?: number
-    width?: number
-    // skipping non_public_metrics
-    // skipping organic_metrics
-    preview_image_url: string
-    // skipping promoted_metrics
-    public_metrics?: {
-        view_count?: number
-    }
-    alt_text?: string
-    // skipping variants
-}
-```
+  }&gt;
+  reply_settings?: 'everyone' | 'mentioned_users' | 'followers'
+  source?: string
+}</code></pre>
+</details>
 
 ### Endpoints
 
