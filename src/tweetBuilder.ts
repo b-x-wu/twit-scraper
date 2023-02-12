@@ -455,8 +455,13 @@ export class TweetBuilder {
     const browser = await puppeteer.launch()
     this.tweetPage = await browser.newPage()
 
-    await this.init(this.tweetPage)
-
+    try {
+      await this.init(this.tweetPage)
+      await Promise.allSettled(this.jobs.map(async (job) => { await job.call(this) }))
+    } finally {
+      await browser.close()
+      this.tweetPage = undefined
+    }
     if (this.id == null || this.tweetData == null || this.tweet == null) {
       throw new TweetError(
         ErrorReason.SERVER_ERROR,
@@ -464,11 +469,6 @@ export class TweetBuilder {
         { id: this.id, tweetData: this.tweetData, tweet: this.tweet }
       )
     }
-
-    await Promise.allSettled(this.jobs.map(async (job) => { await job.call(this) }))
-
-    await browser.close()
-    this.tweetPage = undefined
     return this.tweet
   }
 

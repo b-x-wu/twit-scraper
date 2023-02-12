@@ -2,11 +2,18 @@
 
 import { afterAll, beforeAll, describe, expect, test } from '@jest/globals'
 import { app } from '../src/app'
-import request, { type SuperAgentRequest } from 'superagent'
+import request from 'superagent'
 import { type Server } from 'node:http'
 
 const PORT = 8080
-const get = async (url: string): Promise<SuperAgentRequest> => await request.get(`http://localhost:${PORT}${url}`)
+const get = async (url: string): Promise<{ status: number, body: any }> => {
+  try {
+    const response = await request.get(`http://localhost:${PORT}${url}`)
+    return { status: response.status, body: response.body }
+  } catch (e: any) {
+    return { status: e.status, body: JSON.parse(e.response.text) }
+  }
+}
 
 describe('/tweets/:id endpoint', () => {
   let server: Server
@@ -68,6 +75,64 @@ describe('/tweets/:id endpoint', () => {
         edit_history_tweet_ids: [
           '1624154305564401671'
         ]
+      }
+    }
+
+    expect(actualStatus).toBe(expectedStatus)
+    expect(actualBody).toStrictEqual(expectedBody)
+  }, 10000)
+
+  test('GET tweet that doesn\'t exist fails', async () => {
+    const { status: actualStatus, body: actualBody } = await get('/tweets/12345')
+
+    const expectedStatus = 404
+    const expectedBody = {
+      errors: {
+        reason: 'resource-not-found',
+        detail: 'Tweet data was not initialized. Cannot get base tweet. Tweet may not exist.',
+        data: {
+          id: '12345'
+        },
+        status: 404
+      }
+    }
+
+    expect(actualStatus).toBe(expectedStatus)
+    expect(actualBody).toStrictEqual(expectedBody)
+  }, 10000)
+
+  test('GET tweet that doesn\'t exist fails', async () => {
+    const { status: actualStatus, body: actualBody } = await get('/tweets/12345')
+
+    const expectedStatus = 404
+    const expectedBody = {
+      errors: {
+        reason: 'resource-not-found',
+        detail: 'Tweet data was not initialized. Cannot get base tweet. Tweet may not exist.',
+        data: {
+          id: '12345'
+        },
+        status: 404
+      }
+    }
+
+    expect(actualStatus).toBe(expectedStatus)
+    expect(actualBody).toStrictEqual(expectedBody)
+  }, 10000)
+
+  test('GET tweet that is age restricted errors', async () => {
+    const { status: actualStatus, body: actualBody } = await get('/tweets/1623732372108890112')
+
+    const expectedStatus = 403
+    const expectedBody = {
+      errors: {
+        reason: 'not-authorized-for-resource',
+        detail: 'Tweet is age restricted. Unauthorized to serve this tweet.',
+        data: {
+          id: '1623732372108890112',
+          tombstoneText: 'Age-restricted adult content. This content might not be appropriate for people under 18 years old. To view this media, you’ll need to log in to Twitter. Learn more'
+        },
+        status: 403
       }
     }
 
