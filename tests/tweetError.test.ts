@@ -30,7 +30,7 @@ describe('TweetError', () => {
   test('has correct status for reason ' + ErrorReason.INVALID_REQUEST, async () => {
     const tweetError = new TweetError(ErrorReason.INVALID_REQUEST, 'Invalid request.')
 
-    const expectedStatus = 404
+    const expectedStatus = 400
 
     expect(tweetError.status).toBe(expectedStatus)
   })
