@@ -12,20 +12,26 @@ dotenv.config()
 app.use(cors())
 
 app.get('/tweets/:id', (req, res) => {
-  void (async () => {
-    const id = req.params.id
-    const tweetFields =
+  try {
+    void (async () => {
+      const id = req.params.id
+      const tweetFields =
       queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
 
-    try {
-      const tweet = await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
-      const response: ApiSuccessResult = { data: tweet } // TODO: add support for includes objects
-      res.json(response)
-    } catch (e: any) {
-      const tweetError: TweetError = e
-      res.status(tweetError.status).json({ errors: e })
-    }
-  })()
+      try {
+        const tweet = await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
+        const response: ApiSuccessResult = { data: tweet } // TODO: add support for includes objects
+        res.json(response)
+      } catch (e: any) {
+        const tweetError: TweetError = e
+        res.status(tweetError.status).json({ errors: e })
+      }
+    })()
+  } catch (e) {
+    console.log(e)
+    const error = new TweetError(ErrorReason.INVALID_REQUEST, 'Invalid enpoint accessed')
+    res.status(400).json(error)
+  }
 })
 
 app.get('/tweets', (req, res) => {
