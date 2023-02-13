@@ -135,7 +135,7 @@ export enum ErrorReason {
 }
 export const reasonToStatusMap: Map<ErrorReason, number> = new Map<ErrorReason, number>([
   [ErrorReason.RESOURCE_NOT_FOUND, 404],
-  [ErrorReason.INVALID_REQUEST, 404],
+  [ErrorReason.INVALID_REQUEST, 400],
   [ErrorReason.SERVER_ERROR, 500],
   [ErrorReason.RESOURCE_UNAUTHORIZED, 403]
 ])
