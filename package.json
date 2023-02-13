@@ -4,6 +4,7 @@
   "description": "",
   "main": "./dist/server.js",
   "scripts": {
+    "start": "node ./dist/server.js",
     "dev": "npx tsc-watch --noClear --onSuccess \"node ./out/src/server.js\"",
     "build": "npx tsc -p tsconfig.build.json",
     "test": "npx tsc && jest ./out/tests/*",
