@@ -10,9 +10,7 @@ TODO: write the quick start
 
 ## A word on scope
 
-TODO: rewrite scope
-
-I'm going to try to hit the readonly tweets and users endpoints and only concern myself with the tweet, user, and media objects (and only some of the fields therein). I will consider everything else to be out of scope. More specifics on which fields and which endpoints are hit can be found in the Documentation section.
+So far, this project is in a pre-alpha state. As such, the only endpoints we have are those gettings publically facing Tweets with no options for user authentication. Furthermore, the response fields are somewhat limited in terms of the objects returned. We're hoping that as this API is developed, more features can be added.
 
 ## Endpoints
 
