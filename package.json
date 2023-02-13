@@ -8,8 +8,7 @@
     "dev": "npx tsc-watch --noClear --onSuccess \"node ./out/src/server.js\"",
     "build": "npx tsc -p tsconfig.build.json",
     "test": "npx tsc && jest ./out/tests/*",
-    "lint": "npx eslint .",
-    "install": "npm install --omit=dev"
+    "lint": "npx eslint ."
   },
   "keywords": [],
   "author": "",
