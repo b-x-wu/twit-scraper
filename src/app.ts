@@ -64,5 +64,5 @@ app.get('/tweets', (req, res) => {
 
 app.get('*', (req, res) => {
   const error = new TweetError(ErrorReason.INVALID_REQUEST, 'Invalid enpoint accessed')
-  res.status(error.status).json(error)
+  res.status(400).json(error)
 })
