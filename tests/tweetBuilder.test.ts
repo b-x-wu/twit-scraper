@@ -180,7 +180,7 @@ describe('TweetGetter', () => {
     const expectedIsPossiblySensitive = false
 
     expect(actualTweet.possibly_sensitive).toBe(expectedIsPossiblySensitive)
-  })
+  }, 10000)
 
   test('gets correct language', async () => {
     const actualTweet = await (new TweetBuilder('1623713798292111360'))
@@ -190,7 +190,7 @@ describe('TweetGetter', () => {
     const expectedLanguage = 'en'
 
     expect(actualTweet.lang).toBe(expectedLanguage)
-  })
+  }, 10000)
 
   test('gets correct reply settings', async () => {
     const actualTweet = await (new TweetBuilder('1529447517645025280'))
