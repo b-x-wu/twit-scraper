@@ -1,38 +1,13 @@
 import express from 'express'
 import { TweetBuilder } from './tweetBuilder'
 import { TweetError } from './tweetError'
-import dotenv from 'dotenv'
 import { queryToCommaSeparatedString } from './utils'
 import { type ApiSuccessResult, ErrorReason, type Tweet, type TweetField } from './types'
 import cors from 'cors'
 
 export const app = express()
-dotenv.config()
 
 app.use(cors())
-
-app.get('/tweets/:id', (req, res) => {
-  try {
-    void (async () => {
-      const id = req.params.id
-      const tweetFields =
-      queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
-
-      try {
-        const tweet = await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
-        const response: ApiSuccessResult = { data: tweet } // TODO: add support for includes objects
-        res.json(response)
-      } catch (e: any) {
-        const tweetError: TweetError = e
-        res.status(tweetError.status).json({ errors: e })
-      }
-    })()
-  } catch (e) {
-    console.log(e)
-    const error = new TweetError(ErrorReason.INVALID_REQUEST, 'Invalid enpoint accessed')
-    res.status(400).json(error)
-  }
-})
 
 app.get('/tweets', (req, res) => {
   void (async () => {
@@ -50,7 +25,7 @@ app.get('/tweets', (req, res) => {
       queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
 
     const settledTweets = await Promise.allSettled(ids.map(async (id) => {
-      return await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
+      return await new TweetBuilder(id, true).buildTweetFromFields(tweetFields as TweetField[] | undefined)
     }))
 
     const [fulfilledTweets, rejectedTweets] = settledTweets.reduce<[Array<PromiseFulfilledResult<Tweet>>, PromiseRejectedResult[]]>(
@@ -65,6 +40,23 @@ app.get('/tweets', (req, res) => {
     if (fulfilledTweets.length === 0) { res.status(400) }
     if (rejectedTweets.length > 0) { response.errors = rejectedTweets.map(rejectedTweet => rejectedTweet.reason) }
     res.json(response)
+  })()
+})
+
+app.get('/tweets/:id', (req, res) => {
+  void (async () => {
+    const id = req.params.id
+    const tweetFields =
+        queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
+
+    try {
+      const tweet = await new TweetBuilder(id, true).buildTweetFromFields(tweetFields as TweetField[] | undefined)
+      const response: ApiSuccessResult = { data: tweet } // TODO: add support for includes objects
+      res.json(response)
+    } catch (e: any) {
+      const tweetError: TweetError = e
+      res.status(tweetError.status).json({ errors: tweetError })
+    }
   })()
 })
 

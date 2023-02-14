@@ -1,5 +1,5 @@
 import { type Hashtag, ReferencedTweetTypes, type Tweet, type Url, type Mention, type PublicMetrics, ReplySettings, ErrorReason, TweetField } from './types'
-import puppeteer, { type Page } from 'puppeteer'
+import puppeteer, { type Browser, type Page } from 'puppeteer'
 import { TweetError } from './tweetError'
 
 export class TweetBuilder {
@@ -31,6 +31,7 @@ export class TweetBuilder {
                 const match = entryId.match(/^\w.*?-(\d.*)$/)
                 return match != null && match[1] === this.id
               })
+            console.log('Set the tweet data. Initialization complete.')
           } catch (e: any) {
             if (this.verbose) {
               console.log('Error getting data from response. Likely a preflight request. Skipping...')
@@ -452,8 +453,18 @@ export class TweetBuilder {
   }
 
   async build (): Promise<Tweet> {
-    const browser = await puppeteer.launch()
-    this.tweetPage = await browser.newPage()
+    let browser: Browser
+    try {
+      if (this.verbose) { console.log('Building page...\nGetting browser and loading page with puppeteer...') }
+      browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'], ignoreDefaultArgs: ['--disable-extensions'] })
+      this.tweetPage = await browser.newPage()
+      if (this.verbose) { console.log('Got the page. Attempting to initialize') }
+    } catch {
+      throw new TweetError(
+        ErrorReason.SERVER_ERROR,
+        'Could not open the browser to access the page.'
+      )
+    }
 
     try {
       await this.init(this.tweetPage)
