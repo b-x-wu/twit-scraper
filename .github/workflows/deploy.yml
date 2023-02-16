@@ -23,8 +23,7 @@ jobs:
         run: npm ci
       
       - name: Run tests and linting
-        run: npm test
-        run: npm run lint
+        run: npm test && npm run lint
       
       - name: Install Railway
         run: npm i -g @railway/cli
