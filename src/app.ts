@@ -25,7 +25,7 @@ app.get('/tweets', (req, res) => {
       queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
 
     const settledTweets = await Promise.allSettled(ids.map(async (id) => {
-      return await new TweetBuilder(id, true).buildTweetFromFields(tweetFields as TweetField[] | undefined)
+      return await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
     }))
 
     const [fulfilledTweets, rejectedTweets] = settledTweets.reduce<[Array<PromiseFulfilledResult<Tweet>>, PromiseRejectedResult[]]>(
@@ -50,7 +50,7 @@ app.get('/tweets/:id', (req, res) => {
         queryToCommaSeparatedString(req.query['tweet.fields'] as string | string[] | undefined)?.split(',')
 
     try {
-      const tweet = await new TweetBuilder(id, true).buildTweetFromFields(tweetFields as TweetField[] | undefined)
+      const tweet = await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
       const response: ApiSuccessResult = { data: tweet } // TODO: add support for includes objects
       res.json(response)
     } catch (e: any) {
