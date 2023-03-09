@@ -1,16 +1,31 @@
+[![Run Build and Tests](https://github.com/bruce-x-wu/twit-scraper/actions/workflows/node.js.yml/badge.svg)](https://github.com/bruce-x-wu/twit-scraper/actions/workflows/node.js.yml)
+[![Deploy to Railway](https://github.com/bruce-x-wu/twit-scraper/actions/workflows/deploy.yml/badge.svg?event=release)](https://github.com/bruce-x-wu/twit-scraper/actions/workflows/deploy.yml)
 # Twit-Scraper
 
 An open-source version of Twitter's API with no usage caps, no required registration, and no fees.
 
-TODO: turn todos into github issues
-
 ## Quick Start
 
-TODO: write the quick start
+1. Get the ID of the Tweet you want to gather information about
+    - For example `1625743288924880896`.
+2. Make a GET request to `https://twit-scraper-production.up.railway.app/tweets/<tweet-id>`
+    - Using curl, `curl -X GET "https://twit-scraper-production.up.railway.app/tweets/1625743288924880896`
+3. Parse the JSON response
+    - ```json
+      {
+        "data": {
+          "id": "1625743288924880896",
+          "text": "Happy Valentine's Day! https://t.co/hch0sRoogx",
+          "edit_history_tweet_ids": [
+            "1625743288924880896"
+          ]
+        }
+      }
+      ```
 
 ## A word on scope
 
-So far, this project is in a pre-alpha state. As such, the only endpoints we have are those gettings publically facing Tweets with no options for user authentication. Furthermore, the response fields are somewhat limited in terms of the objects returned. We're hoping that as this API is developed, more features can be added.
+So far, this project is in a pre-alpha state. As such, the only endpoints we have are those gettings publically facing Tweets with no options for user authentication. Furthermore, the response fields are somewhat limited in terms of the objects returned. We're hoping that as this API is developed, more features can be added. For more information on future features, see [the issues on GitHub](https://github.com/bruce-x-wu/twit-scraper/issues).
 
 ## Endpoints
 
@@ -86,10 +101,8 @@ Provides information about multiple tweets given an array of Tweet IDs.
 
 #### Example Request
 
-TODO: replace with the actual domain when that's up
-
 ```bash
-curl -X GET "http://localhost:3000/tweets?ids=1624773381865218051,1624410951616266242,12345&tweet.fields=attachments,author_id,created_at,public_metrics"
+curl -X GET "https://twit-scraper-production.up.railway.app/tweets?ids=1624773381865218051,1624410951616266242,12345&tweet.fields=attachments,author_id,created_at,public_metrics"
 ```
 
 #### Example Response
@@ -240,10 +253,8 @@ Provides information about a single tweet given a Tweet ID.
 
 #### Example Request
 
-TODO: replace with the actual domain when that's up
-
 ```bash
-curl -X GET "http://localhost:3000/tweets/1624773381865218051?tweet.fields=entities,edit_controls,public_metrics,reply_settings,source"
+curl -X GET "https://twit-scraper-production.up.railway.app/tweets/1624773381865218051?tweet.fields=entities,edit_controls,public_metrics,reply_settings,source"
 ```
 
 #### Example Response

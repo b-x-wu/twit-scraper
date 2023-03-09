@@ -18,7 +18,6 @@ export interface Url {
   url: string
   expanded_url: string
   display_url: string
-  // TODO: should there be an unwound url field here?
 }
 
 export enum ReferencedTweetTypes {
@@ -57,23 +56,14 @@ export interface Tweet {
     is_edit_eligible: boolean
     editable_until: string // in the iso-8601 format
   }
-  // TODO: find some way to get geo information
-  // TODO: find some way to get context annotations
   entities?: {
-    // TODO: find some way to get annotations
-    // TODO: I cant find an endpoint where cashtags exist
     hashtags?: Hashtag[]
     mentions?: Mention[]
     urls?: Url[]
   }
-  // TODO: figure out what to do with withheld content information
-  //       right now, finding tweets to test on makes me very uncomfy
   in_reply_to_user_id?: string
   lang?: string // BCP47 language tag
   public_metrics?: PublicMetrics
-  // TODO: find some way to do oauth for non public metrics
-  // TODO: find some way to do oauth for organic metrics
-  // TODO: find some way to do oauth for promoted metrics
   possibly_sensitive?: boolean
   referenced_tweets?: Array<{
     type: ReferencedTweetTypes
@@ -99,7 +89,6 @@ export interface User {
       url: string
     }>
   }
-  // TODO: should we be skipping location?
   pinned_tweet_id?: string
   profile_image_url?: string
   protected?: boolean

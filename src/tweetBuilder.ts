@@ -31,7 +31,6 @@ export class TweetBuilder {
                 const match = entryId.match(/^\w.*?-(\d.*)$/)
                 return match != null && match[1] === this.id
               })
-            console.log('Set the tweet data. Initialization complete.')
           } catch (e: any) {
             if (this.verbose) {
               console.log('Error getting data from response. Likely a preflight request. Skipping...')
@@ -56,7 +55,6 @@ export class TweetBuilder {
       )
     }
 
-    // TODO: figure out what to do with age restricted tweets
     if (this.tweetData.content?.itemContent?.tweet_results?.result?.__typename === 'TweetTombstone') {
       const tombstoneText: string | undefined = this.tweetData.content?.itemContent?.tweet_results?.result?.tombstone?.text?.text
 
@@ -90,8 +88,6 @@ export class TweetBuilder {
         { id: this.id, tombstoneText }
       )
     }
-
-    // TODO: catch the case of the private account
 
     const id = this.tweetData.content?.itemContent?.tweet_results?.result?.rest_id
     const text = this.tweetData.content?.itemContent?.tweet_results?.result?.legacy?.full_text

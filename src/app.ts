@@ -51,7 +51,7 @@ app.get('/tweets/:id', (req, res) => {
 
     try {
       const tweet = await new TweetBuilder(id).buildTweetFromFields(tweetFields as TweetField[] | undefined)
-      const response: ApiSuccessResult = { data: tweet } // TODO: add support for includes objects
+      const response: ApiSuccessResult = { data: tweet }
       res.json(response)
     } catch (e: any) {
       const tweetError: TweetError = e
