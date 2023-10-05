@@ -4,6 +4,10 @@
 
 An open-source version of Twitter's API with no usage caps, no required registration, and no fees.
 
+## Archival Notes
+
+This project no longer operates as expected and as such, is no longer deployed.
+
 ## Quick Start
 
 1. Get the ID of the Tweet you want to gather information about
